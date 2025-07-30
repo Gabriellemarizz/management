@@ -1,0 +1,65 @@
+# Bytecode do Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Arquivos temporários
+*.log
+*.pot
+*.pyc
+*.pyo
+*.swp
+*.bak
+*.tmp
+
+# Ambientes virtuais
+env/
+venv/
+ENV/
+VENV/
+.venv/
+.ENV/
+
+# Distribuição / build
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+pip-wheel-metadata/
+*.whl
+
+# Arquivos de configuração e dados locais
+.env
+.env.*
+*.env
+*.secret
+*.db
+*.sqlite3
+
+# Ferramentas de teste
+htmlcov/
+.tox/
+.nox/
+.coverage
+coverage.xml
+.cache
+pytest_cache/
+
+# IDEs e editores
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# mypy, pyright, pylint
+.mypy_cache/
+.pyright/
+.pyre/
+.pylint.d/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Documentação (Sphinx)
+docs/_build/
