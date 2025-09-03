@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Todo App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1>Dashboard</h1>
+        <p>Bem-vindo, {{ current_user.nome_usuario }}!</p>
+    </div>
+</div>
+
+<!-- Estatísticas -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Concluídas</h5>
+                <h2>{{ tarefas_concluidas }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5 class="card-title">Pendentes</h5>
+                <h2>{{ tarefas_pendentes }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Minhas Listas -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Minhas Listas</h5>
+            </div>
+            <div class="card-body">
+                {% if listas %}
+                    <ul class="list-group">
+                        {% for lista in listas %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ lista.nome }}
+                            <span class="badge bg-primary rounded-pill">{{ lista.tarefas|length }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Você ainda não tem listas. <a href="{{ url_for('main.listas') }}">Criar primeira lista</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tarefas Recentes -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Tarefas Recentes</h5>
+            </div>
+            <div class="card-body">
+                {% if tarefas_recentes %}
+                    <ul class="list-group">
+                        {% for tarefa in tarefas_recentes %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ tarefa.titulo }}</strong>
+                                <br>
+                                <small class="text-muted">{{ tarefa.lista.nome }}</small>
+                            </div>
+                            <div>
+                                <span class="badge bg-{{ 'success' if tarefa.concluida else 'secondary' }} rounded-pill me-2">
+                                    {{ 'Concluída' if tarefa.concluida else 'Pendente' }}
+                                </span>
+                                <!-- Botão de ação rápida -->
+                                <form method="POST" action="{{ url_for('main.concluir_tarefa', tarefa_id=tarefa.id) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-{{ 'warning' if tarefa.concluida else 'success' }}" title="{{ 'Reabrir tarefa' if tarefa.concluida else 'Concluir tarefa' }}">
+                                        {{ '↩️' if tarefa.concluida else '✓' }}
+                                    </button>
+                                </form>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Você ainda não tem tarefas. <a href="{{ url_for('main.tarefas') }}">Criar primeira tarefa</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Links rápidos -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Ações Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('main.listas') }}" class="btn btn-primary me-2">Gerenciar Listas</a>
+                <a href="{{ url_for('main.tarefas') }}" class="btn btn-success me-2">Gerenciar Tarefas</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}card-title">Total de Tarefas</h5>
+                <h2>{{ total_tarefas }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="

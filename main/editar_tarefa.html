@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Tarefa - Todo App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1>Editar Tarefa</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('main.tarefas') }}">Tarefas</a></li>
+                <li class="breadcrumb-item active">Editar: {{ tarefa.titulo }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Formulário de edição -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Editando: "{{ tarefa.titulo }}"</h5>
+                <small class="text-muted">
+                    Criada em: {{ tarefa.criada_em.strftime('%d/%m/%Y às %H:%M') }}
+                    {% if tarefa.atualizada_em != tarefa.criada_em %}
+                    | Última atualização: {{ tarefa.atualizada_em.strftime('%d/%m/%Y às %H:%M') }}
+                    {% endif %}
+                </small>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.titulo.label(class="form-label") }}
+                                {{ form.titulo(class="form-control") }}
+                                {% if form.titulo.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.titulo.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.lista_id.label(class="form-label") }}
+                                {{ form.lista_id(class="form-select") }}
+                                {% if form.lista_id.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.lista_id.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.descricao.label(class="form-label") }}
+                        {{ form.descricao(class="form-control", rows="4") }}
+                        {% if form.descricao.errors %}
+                            <div class="text-danger">
+                                {% for error in form.descricao.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.prioridade.label(class="form-label") }}
+                                {{ form.prioridade(class="form-select") }}
+                                {% if form.prioridade.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.prioridade.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.data_limite.label(class="form-label") }}
+                                {{ form.data_limite(class="form-control") }}
+                                {% if form.data_limite.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.data_limite.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">Deixe em branco se não houver data limite</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botões de ação -->
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            {{ form.submit(class="btn btn-success me-2") }}
+                            <a href="{{ url_for('main.tarefas') }}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                        <div>
+                            <!-- Status atual da tarefa -->
+                            <span class="badge bg-{{ 'success' if tarefa.concluida else 'secondary' }} fs-6">
+                                Status: {{ 'Concluída' if tarefa.concluida else 'Pendente' }}
+                            </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Informações da tarefa -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6>Informações da Tarefa</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>ID:</strong> {{ tarefa.id }}</p>
+                <p><strong>Status:</strong> 
+                    <span class="badge bg-{{ 'success' if tarefa.concluida else 'secondary' }}">
+                        {{ 'Concluída' if tarefa.concluida else 'Pendente' }}
+                    </span>
+                </p>
+                <p><strong>Lista Atual:</strong> {{ tarefa.lista.nome }}</p>
+                <p><strong>Prioridade Atual:</strong> 
+                    <span class="badge bg-{{ 'danger' if tarefa.prioridade == 'Urgente' 
+                                          else 'warning' if tarefa.prioridade == 'Alta' 
+                                          else 'info' if tarefa.prioridade == 'Normal' 
+                                          else 'secondary' }}">
+                        {{ tarefa.prioridade }}
+                    </span>
+                </p>
+                {% if tarefa.data_limite %}
+                <p><strong>Data Limite:</strong> {{ tarefa.data_limite.strftime('%d/%m/%Y') }}</p>
+                {% endif %}
+                
+                <!-- Ações rápidas -->
+                <hr>
+                <h6>Ações Rápidas</h6>
+                <form method="POST" action="{{ url_for('main.concluir_tarefa', tarefa_id=tarefa.id) }}" class="mb-2">
+                    <button type="submit" class="btn btn-sm btn-{{ 'warning' if tarefa.concluida else 'success' }} w-100">
+                        {{ 'Marcar como Pendente' if tarefa.concluida else 'Marcar como Concluída' }}
+                    </button>
+                </form>
+                
+                <form method="POST" action="{{ url_for('main.excluir_tarefa', tarefa_id=tarefa.id) }}" 
+                      onsubmit="return confirm('Tem certeza que deseja excluir esta tarefa?')">
+                    <button type="submit" class="btn btn-sm btn-danger w-100">
+                        Excluir Tarefa
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

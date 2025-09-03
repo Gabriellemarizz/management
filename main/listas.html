@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Listas - Todo App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1>Minhas Listas</h1>
+    </div>
+</div>
+
+<!-- Formulário para criar nova lista -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Criar Nova Lista</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('main.nova_lista') }}">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome da Lista</label>
+                        <input type="text" class="form-control" id="nome" name="nome" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Criar Lista</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista das listas existentes -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Suas Listas</h5>
+            </div>
+            <div class="card-body">
+                {% if listas %}
+                    <div class="row">
+                        {% for lista in listas %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ lista.nome }}</h5>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            {{ lista.tarefas|length }} 
+                                            {{ 'tarefa' if lista.tarefas|length == 1 else 'tarefas' }}
+                                        </small>
+                                    </p>
+                                    
+                                    <!-- Lista das tarefas desta lista -->
+                                    {% if lista.tarefas %}
+                                        <ul class="list-group list-group-flush">
+                                            {% for tarefa in lista.tarefas[:3] %}
+                                            <li class="list-group-item px-0 py-1">
+                                                <small>
+                                                    {% if tarefa.concluida %}
+                                                        <span class="text-success">✓</span>
+                                                    {% else %}
+                                                        <span class="text-muted">○</span>
+                                                    {% endif %}
+                                                    {{ tarefa.titulo }}
+                                                </small>
+                                            </li>
+                                            {% endfor %}
+                                            {% if lista.tarefas|length > 3 %}
+                                            <li class="list-group-item px-0 py-1">
+                                                <small class="text-muted">
+                                                    ... e mais {{ lista.tarefas|length - 3 }} tarefa(s)
+                                                </small>
+                                            </li>
+                                            {% endif %}
+                                        </ul>
+                                    {% endif %}
+                                    
+                                    <!-- Botões para editar e excluir lista -->
+                                    <div class="mt-3">
+                                        <!-- Botão que abre modal para editar -->
+                                        <button type="button" class="btn btn-sm btn-primary me-2" 
+                                                data-bs-toggle="modal" data-bs-target="#editarModal{{ lista.id }}">
+                                            Editar Nome
+                                        </button>
+                                        
+                                        <form method="POST" action="{{ url_for('main.excluir_lista', lista_id=lista.id) }}" 
+                                              style="display: inline;"
+                                              onsubmit="return confirm('Tem certeza? Isso excluirá a lista e TODAS as suas tarefas!')">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                Excluir Lista
+                                            </button>
+                                        </form>
+                                    </div>
+                                    
+                                    <!-- Modal para editar nome da lista -->
+                                    <div class="modal fade" id="editarModal{{ lista.id }}" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Editar Lista</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <form method="POST" action="{{ url_for('main.editar_lista', lista_id=lista.id) }}">
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label for="nome{{ lista.id }}" class="form-label">Nome da Lista</label>
+                                                            <input type="text" class="form-control" id="nome{{ lista.id }}" 
+                                                                   name="nome" value="{{ lista.nome }}" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center">
+                        <p>Você ainda não criou nenhuma lista.</p>
+                        <p>Use o formulário acima para criar sua primeira lista!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
