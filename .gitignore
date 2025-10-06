@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Scripts de teste
+test_code.py
+
+
 # Arquivos temporários
 *.log
 *.pot
