@@ -22,7 +22,10 @@ auth_bp = Blueprint(
 def logar_no_sistema():
     # Definindo formulário 
     formulario = Login_Form()
-    if request.method == "POST":
+
+    # Aqui não preciso saber o tipo da requesição, uma vez que validate_on_submite é se
+    # os dados estiverem corretos e for do tipo "POST".
+    if formulario.validate_on_submit():
         username = formulario.username.data
         password = formulario.password.data
 
@@ -40,17 +43,22 @@ def logar_no_sistema():
             # Caso da senha estar errada. O alert não revela o dado que está errado para evitar 
             # facilitar a vida do hacker
             else:
-                flash('username ou senha está errado')
+                flash('username ou senha está incorreto')
                 return redirect(url_for('auth.logar_no_sistema'))
             
         # Caso do username estar errado. O alert não revela o dado que está errado para evitar 
         # facilitar a vida do hacker
         else:
-            flash('username ou senha está errado')
+            flash('username ou senha está incorreto')
             return redirect(url_for('auth.logar_no_sistema'))
-        
-    else: 
-        return render_template('./auth/login.html', formulario=formulario)
+    
+    # As mensagens de erro do formulario WTF não aparecerão no html uma vez que o flask_wtf 
+    # só deixa enviar o formulário se os campus username e senha estiverem preenchidos. 
+    # A mensagem só apareceria se fosse enivado valores nulos.
+    # As mensagens flash estão aparecendo perfeitamente 
+
+    # Se os dados estiverem errados ou a requisição for do tipo "GET"
+    return render_template('./auth/login.html', formulario=formulario)
         
 
 # Rota para cadastrar usuário 
