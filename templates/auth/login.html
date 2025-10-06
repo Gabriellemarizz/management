@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="{{ url_for('auth.logar_no_sistema') }}", method="POST">
+        {{ formulario.hidden_tag() }}
+        {{ formulario.username.label }}
+        {{ formulario.username(size = 32) }}
+        <br><br>
+        {{ formulario.password.label}}
+        {{ formulario.password(size=32)}}
+        <br>
+        <br>
+        {{ formulario.submit() }}
+    </form>
+</body>
+</html>

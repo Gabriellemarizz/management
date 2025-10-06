@@ -1,7 +1,12 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import sessionmaker
+from flask_login import UserMixin
+# Biblioteca para salvar senha em hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
+
 
 tarefa_etiqueta = db.Table(
     'tarefa_etiqueta',
@@ -9,15 +14,32 @@ tarefa_etiqueta = db.Table(
     db.Column('etiqueta_id', db.Integer, db.ForeignKey('etiqueta.id'), primary_key=True)
 )
 
-class Usuario(db.Model):
+class Usuario(db.Model, UserMixin):
     __tablename__ = 'usuario'
     id = db.Column(db.Integer, primary_key=True)
     nome_usuario = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    senha_hash = db.Column(db.String(128), nullable=False)
+    senha_hash = db.Column(db.String(128), nullable=True)
     listas = db.relationship('Lista', backref='dono', lazy=True)
     tarefas = db.relationship('Tarefa', backref='usuario', lazy=True)
     comentarios = db.relationship('Comentario', backref='usuario', lazy=True)
+
+    # Criando função para salvar a senha no sistema em forma de hash 
+    def set_password(self, senha_hash):
+        # As adições feitas nesse metodo comum é para deixar a senha extremamente mais forte 
+        # e preparada contra ataques de força bruta. 
+        self.senha_hash = generate_password_hash(senha_hash, method='scrypt', salt_length=64)
+
+    # Criando função para comparar a senha do usuário com aquela que foi inserida na hora do login
+    def check_password(self, senha):
+        verificador = check_password_hash(self.senha_hash, senha)
+        if verificador:
+            return True
+        else:
+            return False
+        
+    
+
 
 class Lista(db.Model):
     __tablename__ = 'lista'

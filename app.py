@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_login import LoginManager
-from models.database import db
-from models.usuario import Usuario
+from models.models import db
+from models.models import Usuario
 from controllers.auth_controller import auth_bp
-from controllers.main_controller import main_bp
+from controllers.user_controller import user_bp
 
 def create_app():
 
@@ -21,7 +21,8 @@ def create_app():
     # Configurando Flask-Login
     login_manager = LoginManager()
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'  
+    # Aqui é a rota que o usuário será redirecionando quando não estive logado no sistema
+    login_manager.login_view = 'auth.logar_no_sistema'  
     login_manager.login_message = 'Por favor, faça login para acessar esta página.'
     
     # Função para carregar usuário 
@@ -32,7 +33,7 @@ def create_app():
 
     # Registrando blueprints 
     app.register_blueprint(auth_bp)
-    app.register_blueprint(main_bp)
+    app.register_blueprint(user_bp)
     
     # Criando tabelas do banco de dados
     with app.app_context():
