@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/estilo.css">
+    <title>Document</title>
+</head>
+<body>
+    <form action="{{ url_for('auth.cadastrar_usuario') }}" method="post">
+        {{ formulario_cad.hidden_tag() }}
+        {{ formulario_cad.nome.label }}
+        {{ formulario_cad.nome(size=32) }}
+        {% for erro in formulario_cad.nome.errors %}
+        <div class="mensagem_de_erro">
+            {{erro}} 
+        </div>
+        {% endfor %}
+        <br><br>
+        {{ formulario_cad.email.label }}
+        {{ formulario_cad.email(size=32) }}
+        {% for erro in formulario_cad.email.errors %}
+        <div class="mensagem_de_erro">{{erro}}</div>
+        {% endfor %}
+    
+        <br><br>
+        {{ formulario_cad.senha.label }}
+        {{ formulario_cad.senha(size=32) }}
+        {% for erro in formulario_cad.senha.errors %}
+        <div class="mensagem_de_erro">
+            {{erro}}
+        </div>
+        {% endfor %}
+        <br>
+        {{ formulario_cad.submit() }}
+    </form>
+</body>
+</html>

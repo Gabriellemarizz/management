@@ -259,3 +259,8 @@ header {
     border-radius: 0%;
     transition: transform 0.5s ease;
 }
+
+
+.mensagem_de_erro {
+    color: red;
+}
