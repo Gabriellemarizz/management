@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="{{ url_for('user.editar_tarefa', id=id) }}" method="post">
+        {{ formulario.hidden_tag() }}
+        {{ formulario.titulo.label }}
+        {{ formulario.titulo(size=30) }}
+        {% for erro in formulario.titulo.errors %}
+        <div class="mensagem_de_erro">
+            {{ erro }}
+        </div>
+        {% endfor %}
+        <br>
+        {{ formulario.descricao.label }}
+        {{ formulario.descricao(size=200) }}
+        {% for erro in formulario.descricao.errors %}
+        <div class="mensagem_de_erro">
+            {{ erro }}
+        </div>
+        {% endfor %}
+        <br>
+        {{ formulario.data_limite.label }}
+        {{ formulario.data_limite }}
+        {% for erro in formulario.data_limite.errors %}
+        <div class="mensagem_de_erro">
+            {{ erro }}
+        </div>
+        {% endfor %}
+        <br>
+        {{ formulario.prioridade.label }}
+        {{ formulario.prioridade }}
+        {% for erro in formulario.prioridade.errors %}
+        <div class="mensagem_de_erro">
+            {{ erro }}
+        </div>
+        {% endfor %}
+        <br>
+        {{ formulario.lista_id.label }}
+        {{ formulario.lista_id }}
+        {% for erro in formulario.lista_id.errors %}
+        <div class="mensagem_de_erro">
+            {{ erro }}
+        </div>
+        {% endfor %}
+        <br>
+        {{ formulario.submit(value='Atualizar atividade') }}
+    </form>
+    
+</body>
+</html>

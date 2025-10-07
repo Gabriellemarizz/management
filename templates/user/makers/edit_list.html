@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/estilo.css">
+    <title>Document</title>
+</head>
+<body>
+    <form action="{{ url_for('user.editar_lista', id=id) }}" method="post">
+        {{ formulario.hidden_tag() }}
+        {{ formulario.nome.label }}
+        {{ formulario.nome(size=30) }}
+        <br>
+        {% for erro in formulario.nome.errors %}
+        <div class="mensagem_de_erro">
+            {{ erro }}
+        </div>
+        {% endfor %}
+        <br>
+        {{ formulario.submit(value='Atualizar lista') }}
+        <br>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% set category, message = messages[-1] %}
+                    <li>{{ message }}</li>
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </form>
+</body>
+</html>

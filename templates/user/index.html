@@ -8,5 +8,44 @@
 <body>
     <h1>Você está logado no sistema, seja bem vindo!</h1>
     <a href="{{ url_for('auth.deslogar_do_sistema') }}">Logout</a>
+    <h3><a href="{{ url_for('user.criar_lista') }}">Criar lista</a></h3>
+    <!-- Próximo passo será desenvolver as atividades, meu foco agora é: -->
+        <!-- 
+             1. Editar | V
+             2. Excluir listas | V    
+        -->
+    <h3><a href="{{ url_for('user.criar_atividade') }}">criar atividade</a></h3> 
+    
+    
+    
+    <h4>Minhas listas</h4>
+    <ul>
+        {% for list in listas %}
+        <li>{{ list.nome }} <a href="{{ url_for('user.editar_lista', id=list.id) }}">Editar</a> <a href="{{ url_for('user.excluir_lista', id=list.id) }}">Excluir</a></li>
+        {% else %}
+        <li>Nenhuma lista foi criada ainda</li>
+        {% endfor %}
+    </ul>
+
+    <h4> Minhas tarefas </h4>
+    <ul>
+        {% for tarefa in tarefas %}
+        <li>
+            <div>
+                <h4>{{tarefa.titulo}}</h4>
+                <p>{{tarefa.descricao}}</p>
+                <h4>Data limite:</h4>
+                <p>{{tarefa.data_limite}}</p>
+                <h4>Prioridade:</h4>
+                <p>{{tarefa.prioridade}}</p>
+                <h4>lista:</h4>
+                <p>{{ tarefa.lista.nome }}</p>
+                <br>
+                <a href="{{ url_for('user.editar_tarefa', id = tarefa.id) }}">Editar</a>
+                <a href="{{ url_for('user.excluir_tarefa', id = tarefa.id) }}">Excluir</a>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
 </body>
 </html>

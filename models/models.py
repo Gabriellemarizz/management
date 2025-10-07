@@ -44,7 +44,7 @@ class Usuario(db.Model, UserMixin):
 class Lista(db.Model):
     __tablename__ = 'lista'
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(120), nullable=False)
+    nome = db.Column(db.String(120), nullable=False, unique=True)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     tarefas = db.relationship('Tarefa', backref='lista', lazy=True)
 
@@ -61,7 +61,7 @@ class Tarefa(db.Model):
     descricao = db.Column(db.Text)
     data_limite = db.Column(db.DateTime)
     concluida = db.Column(db.Boolean, default=False)
-    prioridade = db.Column(db.String(20), default='Normal') # Baixa, Normal, Alta, Urgente
+    prioridade = db.Column(db.String(20), default='normal') # Baixa, Normal, Alta, Urgente
     criada_em = db.Column(db.DateTime, default=datetime.utcnow)
     atualizada_em = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     lista_id = db.Column(db.Integer, db.ForeignKey('lista.id'), nullable=False)
