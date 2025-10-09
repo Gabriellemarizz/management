@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateField, SelectField, SubmitField
+from wtforms import StringField, DateField, SelectField, SubmitField, SelectMultipleField, widgets
 from wtforms.validators import DataRequired, Length
 
 
@@ -33,6 +33,19 @@ class TaskForm(FlaskForm):
         coerce=int,
         validators=[DataRequired(message='Associação a alguma lista é obrigatória, se não tem lista, é preciso criar uma nova')]
         )
+    
+    status = SelectField(
+        'status',
+        choices=[('pendente', 'Pendente'), ('em andamento', 'Em Andamento'), ('concluida', 'Concluída')],
+        default='pendente'
+    )
+
+    etiquetas = SelectMultipleField(
+        'etiquetas',
+        coerce=int,
+        option_widget= widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False)
+    )
 
     submit = SubmitField('Criar atividade')
 
@@ -47,6 +60,10 @@ class TaskForm(FlaskForm):
     def __init__(self, user_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
         from models.models import Lista
+        from models.models import Etiqueta
+        etiquetas = Etiqueta.query.filter_by(usuario_id=user_id).all()
         listas = Lista.query.filter_by(usuario_id=user_id).all()
         # Agora teremos conteúdo para mostrar no selectField 
         self.lista_id.choices = [(lista.id, lista.nome) for lista in listas]
+        # Agora teremos conteúdo para mostrar no SelectMultipleField
+        self.etiquetas.choices = [(etiqueta.id, etiqueta.nome) for etiqueta in etiquetas]

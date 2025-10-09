@@ -40,9 +40,25 @@
         </div>
         {% endfor %}
         <br>
+        {{ formulario.status.label }}
+        {{ formulario.status }}
+        {% for erro in formulario.status.erros %}
+        <div class="mensagem_de_erro">
+            {{ erro }}
+        </div>
+        {% endfor %}
+        <br>
         {{ formulario.lista_id.label }}
         {{ formulario.lista_id }}
         {% for erro in formulario.lista_id.errors %}
+        <div class="mensagem_de_erro">
+            {{ erro }}
+        </div>
+        {% endfor %}
+        <br>
+        {{ formulario.etiquetas.label }}
+        {{ formulario.etiquetas }}
+        {% for erro in formulario.etiquetas.erros %}
         <div class="mensagem_de_erro">
             {{ erro }}
         </div>

@@ -53,6 +53,8 @@ class Etiqueta(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(64), unique=True, nullable=False)
     tarefas = db.relationship('Tarefa', secondary=tarefa_etiqueta, back_populates='etiquetas')
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+
 
 class Tarefa(db.Model):
     __tablename__ = 'tarefa'
@@ -60,8 +62,9 @@ class Tarefa(db.Model):
     titulo = db.Column(db.String(200), nullable=False)
     descricao = db.Column(db.Text)
     data_limite = db.Column(db.DateTime)
-    concluida = db.Column(db.Boolean, default=False)
+    status = db.Column(db.String(20), default='pendente') # Pendente, Em Andamento, Concluída
     prioridade = db.Column(db.String(20), default='normal') # Baixa, Normal, Alta, Urgente
+    ordem = db.Column(db.Integer, default=0) # Aqui é um campo do banco para poder posicionar tarefas de maneira manual de acordo com esse ínice, que ficará variando
     criada_em = db.Column(db.DateTime, default=datetime.utcnow)
     atualizada_em = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     lista_id = db.Column(db.Integer, db.ForeignKey('lista.id'), nullable=False)
