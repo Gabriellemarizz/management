@@ -116,6 +116,7 @@ def index():
             filtro_lista = filtro_item.get('lista')
             filtro_status = filtro_item.get('status')
             filtro_etiquetas = filtro_item.get('etiquetas')
+            filtro_palavras_chave = filtro_item.get('palavras_chave')
             
             # Checkando sua existencia e aplicando na lista de tarefas geral
             if filtro_lista:
@@ -129,6 +130,22 @@ def index():
 
                 tarefas = [
                     t for t in tarefas if all(e_id in [etq.id for etq in t.etiquetas] for e_id in filtro_etiquetas_ids)
+                ]
+
+            if filtro_palavras_chave:
+                return f"Está filtrando meu quirido{filtro_palavras_chave}"
+    
+    # Sitema de filtro por palavra chave
+
+    # Verificando se sistema de busca por palavra chave está ativo
+    modo_filtro_palavras_chave = session.get('filtro_palavra_chave_modo')
+
+    if modo_filtro_palavras_chave:
+        palavras_chave = session.get('filtro_palavra_chave', [])
+
+        if palavras_chave:
+            tarefas = [
+                    t for t in tarefas if palavras_chave.lower() in t.titulo.lower() or palavras_chave.lower() in t.descricao.lower()
                 ]
 
 
@@ -398,6 +415,10 @@ def filtrar_tarefas():
     lista = request.form.get('lista')
     etiquetas = request.form.getlist('etiqueta_filtro')
 
+    if not status and not lista and not etiquetas:
+        # Se ele não marcar nada e quiser filtrar, ele é redirecionado para a rota principal de usuários sem ativar o filtro 
+        return redirect(url_for('user.index'))
+
     # Preenchendo a lista de filtro com as opções enviadas pelo usuário
     session['filtros'] = [{'status':status, 'lista':lista, 'etiquetas': etiquetas}]
 
@@ -421,6 +442,37 @@ def limpar_filtro():
     return redirect(url_for('user.index'))
 
 
+# Pesquisando por palavras-chave
+@user_bp.route('/filtrar_tarefas_by_palavras_chave', methods=['POST'])
+@login_required
+def filtrar_tarefas_by_palavras_chave():
+
+    palavras_chave = request.form.get('barra_pesquisa')
+
+    if not palavras_chave.replace(" ", ""):
+        # Como ele não digitou nada, ou só enviou espaço, ele volta para a página sem ativar o filtro
+        return redirect(url_for('user.index'))
+
+    session['filtro_palavra_chave'] = palavras_chave
+
+    session['filtro_palavra_chave_modo'] = True
+
+    # Redirecionando para a rota principal de usuário
+    return redirect(url_for('user.index'))
+
+# Apagando palavras chave
+@user_bp.route('/apagar_filtro_de_palavras_chave', methods = ['GET'])
+@login_required
+def apagar_filtro_de_palavras_chave():
+
+    # Desligando o filtro
+    session['filtro_palavra_chave_modo'] = False
+
+    # Apagando as palavras chave
+    session.pop('filtro_palavra_chave', None)
+
+    # Retornando para a rota principal de usuários 
+    return redirect(url_for('user.index'))
 
 
 

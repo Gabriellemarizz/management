@@ -4,6 +4,7 @@ from models.models import db
 from models.models import Usuario
 from controllers.auth_controller import auth_bp
 from controllers.user_controller import user_bp
+from controllers.email_controller import email_bp, iniciar_scheduler
 
 def create_app():
 
@@ -34,6 +35,10 @@ def create_app():
     # Registrando blueprints 
     app.register_blueprint(auth_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(email_bp)
+
+    # Inicializado a biblioteca de trabalho automático para enviar meus emails automaticamente as 17h50
+    iniciar_scheduler(app)
     
     # Criando tabelas do banco de dados
     with app.app_context():

@@ -8,6 +8,11 @@ from forms.cad_form import FormCad
 from models.models import Usuario 
 # Importando banco de dados DB para realizar operações Crud
 from models.models import db
+# Importando bibliotecas para enviar email de confirmação
+import yagmail
+from controllers.email_controller import verificar_conexao
+from random import randint
+from forms.cod_form import CodeForm
 
 # Definindo o blueprint para login
 auth_bp = Blueprint(
@@ -76,29 +81,82 @@ def cadastrar_usuario():
         email = formulario_cad.email.data
         senha = formulario_cad.senha.data
 
-        # CADASTRANDO USUÁRIO
+        # Colocando dados dentro de um session
+        session['dados_usuario'] = [username, email, senha]
+        # Criando código e colocando em uma session
+        codigo = randint(100000,999999)
+        session['codigo_verificador'] = codigo
 
-        # Como eu não construi a classe Usuario com self, eu tenho que passar manualmente quais
-        # Atributos eu quero inserir, não posso apenas jogar pela ordem.
-        novo_usuário = Usuario(nome_usuario=username, email=email)
-        # Usando set_password para gerar a senha em hash
-        novo_usuário.set_password(senha)
-        # Adicionando usuario no banco
-        db.session.add(novo_usuário)
-        # Finalizando a operação de inserção de novo usuário
-        db.session.commit()
-            
+        # Redirecionando dados para a rota de checar email
 
-        # Logando novo usuário no sistema
-        login_user(novo_usuário)
+        return redirect(url_for('auth.checar_email'))
 
-        # Redirecionando ele para o controlador de usuários
-        return redirect(url_for('user.index'))
+        
 
     # Aqui, se não for post e se houver erros ele renderiza o formulário com as mensagens de
     # erro que houveram durante o cadastramento
     return render_template('./auth/cadastramento.html', formulario_cad=formulario_cad)
         
+
+# Rota para checar email
+@auth_bp.route('/checar_email', methods=['POST', 'GET'])
+def checar_email():
+    # Pegando dados da rota de cadastro
+    dados_usuarios = session.get('dados_usuario')
+    # Carregando o formulário de código
+    formulario = CodeForm()
+    # Carregando código verificador 
+    codigo_verificador = session.get('codigo_verificador')
+    
+    # Recebendo dados de formulário
+    if formulario.validate_on_submit():
+        codigo_email = formulario.codigo.data
+        if codigo_email == codigo_verificador:
+            # Cadastrando usuario
+            # Como eu não construi a classe Usuario com self, eu tenho que passar manualmente quais
+            # Atributos eu quero inserir, não posso apenas jogar pela ordem.
+            novo_usuário = Usuario(nome_usuario=dados_usuarios[0], email=dados_usuarios[1])
+            # Usando set_password para gerar a senha em hash
+            novo_usuário.set_password(dados_usuarios[2])
+            # Adicionando usuario no banco
+            db.session.add(novo_usuário)
+            # Finalizando a operação de inserção de novo usuário
+            db.session.commit()
+            
+
+            # Logando novo usuário no sistema
+            login_user(novo_usuário)
+
+            # Redirecionando ele para o controlador de usuários
+            return redirect(url_for('user.index'))
+        
+        else:
+            flash('Código errado! Reenvie o código ou tente novamente com outro email')
+            return redirect(url_for('auth.checar_email'))
+    
+
+    # ENVIANDO EMAIL COM CÓDIGO
+    email = dados_usuarios[1]
+
+    mensagem = f'Código para confirmação: {codigo_verificador}'
+
+    if not verificar_conexao():
+        return "Não é possível realizar cadastramento por falta de conexão a internet"
+
+    else:
+        yag = yagmail.SMTP('l.kevenmedeiros.c@gmail.com', 'ozgj viwb whju dmot')
+        yag.send(
+            to=email,
+            subject="Confirme seu email",
+            contents=mensagem
+        )
+
+    return render_template('./email/cod_email.html', formulario=formulario)
+        
+
+    
+
+
 
 
 

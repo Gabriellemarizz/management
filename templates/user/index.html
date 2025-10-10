@@ -92,11 +92,30 @@
         <br>
         <a href="{{ url_for('user.limpar_filtro') }}">Limpar filtro</a>
         <br>
+        <br>
+                <form action="{{ url_for('user.filtrar_tarefas_by_palavras_chave') }}" method="post">
+                    <label for="barra_pesquisa">O que você procura?
+                        {% if session.get('filtro_palavra_chave_modo')==True %}
+                        <input value="{{ session.get('filtro_palavra_chave') }}" name="barra_pesquisa" type="text">
+                        {% else %}
+                        <input type="text" name="barra_pesquisa">
+                        {% endif %}
+                    </label>
+                    <br>
+                    <input type="submit" value="Pesquisar">
+                </form>
+                <a href="{{ url_for('user.apagar_filtro_de_palavras_chave') }}">Limpar barra de pesquisa</a>
+            <br>
+        <br>
         <ul {% if ordem=='manual' %} id="lista_de_tarefas" {% endif %}>
         {% for tarefa in tarefas %}
+
+
+
         <li data-id="{{ tarefa.id }}" >
             <div class="task" style="background-color: blue;">
                 <h4>{{ tarefa.titulo }}</h4>
+                <p> {{ tarefa.descricao }}</p>
                 <p>{{ tarefa.status }}</p>
                 <p>{{ tarefa.lista.nome }}</p>
                 <p>{{ tarefa.prioridade }}</p>
