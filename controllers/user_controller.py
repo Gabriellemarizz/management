@@ -44,12 +44,12 @@ def index():
 
     # Recentes: Vai da mais recente até a mais antiga
     if ordem == 'recentes':
-        tarefas = Tarefa.query.order_by(Tarefa.criada_em.desc()).all()
+        tarefas = Tarefa.query.filter_by(usuario_id=current_user.id).order_by(Tarefa.criada_em.desc()).all()
         pass
         
     # Antigas: Vai da mais antiga até a mais recente
     elif ordem=='antigas':
-        tarefas = Tarefa.query.order_by(Tarefa.criada_em.asc()).all()
+        tarefas = Tarefa.query.filter_by(usuario_id=current_user.id).order_by(Tarefa.criada_em.asc()).all()
         pass
 
 
@@ -57,12 +57,12 @@ def index():
         
     # Prazo curto: Dos mais curtos até os mais longos 
     elif ordem=='prazo_curto':
-        tarefas = Tarefa.query.order_by(Tarefa.data_limite.asc()).all()
+        tarefas = Tarefa.query.filter_by(usuario_id=current_user.id).order_by(Tarefa.data_limite.asc()).all()
         pass
 
     # Prazo longo: Dos prazos maiores até os mais curtos 
     elif ordem == 'prazo_longo':
-        tarefas = Tarefa.query.order_by(Tarefa.data_limite.desc()).all()
+        tarefas = Tarefa.query.filter_by(usuario_id=current_user.id).order_by(Tarefa.data_limite.desc()).all()
         pass
 
 
@@ -86,12 +86,12 @@ def index():
         )
 
         # Ordenando das mais importantes até as menos importantes
-        tarefas = Tarefa.query.order_by(priorizador.asc()).all()
+        tarefas = Tarefa.query.filter_by(usuario_id=current_user.id).order_by(priorizador.asc()).all()
         pass
 
     # Ordenando no modo manual 
     elif ordem=='manual':
-        tarefas = Tarefa.query.order_by(Tarefa.ordem.asc()).all()
+        tarefas = Tarefa.query.filter_by(usuario_id=current_user.id).order_by(Tarefa.ordem.asc()).all()
         pass
 
     # Salvando a variável temporária 'tempo_restante' em cada objeto presente na lista de tarefas
@@ -143,9 +143,17 @@ def index():
     if modo_filtro_palavras_chave:
         palavras_chave = session.get('filtro_palavra_chave', [])
 
+
         if palavras_chave:
+            # Criando lista de várias palavras 
+            palavras_chave_list = palavras_chave.split()
+           
             tarefas = [
-                    t for t in tarefas if palavras_chave.lower() in t.titulo.lower() or palavras_chave.lower() in t.descricao.lower()
+                    t for t in tarefas 
+                    # Aqui ele salva a tarefa na lista que contenha alguma das condições (palavras da lista palavras_chave_list)
+                    # Essa é uma solução mais inteligente do que pegar uma única palavra para poder filtrar na barra de pesquisa, 
+                    # e se você escrever alguma palavra que esteja e um que não esteja, ele salva mesmo assim.
+                    if any(palavra.lower() in (t.titulo + t.descricao).lower() for palavra in palavras_chave_list) 
                 ]
 
 
