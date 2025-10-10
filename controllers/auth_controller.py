@@ -13,6 +13,10 @@ import yagmail
 from controllers.email_controller import verificar_conexao
 from random import randint
 from forms.cod_form import CodeForm
+# Importando formulário para atualizações que o usuário queira realizar
+from forms.password_form import SenhaForm
+from forms.confirm_password_form import ConfirmSenhaForm
+from forms.email_form import EmailForm
 
 # Definindo o blueprint para login
 auth_bp = Blueprint(
@@ -101,6 +105,55 @@ def cadastrar_usuario():
 # Rota para checar email
 @auth_bp.route('/checar_email', methods=['POST', 'GET'])
 def checar_email():
+
+    # Instruções: Checar email pode vir de duas rotas distintas entre si.
+    # 1º) É de cadastrar_usuario 
+    # 2º) É de atualizar email
+    # Um verificador de origem será enviado da rota atualizar_email, para que a rota apenas atualize e não cadastre um novo usuário
+
+    # Pegando dados da rota de cadastro
+    dados_usuarios = session.get('dados_usuario')
+    # Carregando o formulário de código
+    formulario = CodeForm()
+    # Carregando código verificador 
+    codigo_verificador = session.get('codigo_verificador')
+    # Carregando origem
+    origem = request.args.get('origem')
+
+
+    # ROTA DE ATUALIZAR EMAIL
+
+    if origem == 'atualizar_email':
+        # Recebendo dados de formulário
+        if formulario.validate_on_submit():
+            codigo_email = formulario.codigo.data
+            if codigo_email == codigo_verificador:
+                # Cadastrando usuario
+                # Como eu não construi a classe Usuario com self, eu tenho que passar manualmente quais
+                # Atributos eu quero inserir, não posso apenas jogar pela ordem.
+                novo_usuário = Usuario(nome_usuario=dados_usuarios[0], email=dados_usuarios[1])
+                # Usando set_password para gerar a senha em hash
+                novo_usuário.set_password(dados_usuarios[2])
+                # Adicionando usuario no banco
+                db.session.add(novo_usuário)
+                # Finalizando a operação de inserção de novo usuário
+                db.session.commit()
+                
+
+                # Logando novo usuário no sistema
+                login_user(novo_usuário)
+
+                # Redirecionando ele para o controlador de usuários
+                return redirect(url_for('user.index'))
+            
+            else:
+                flash('Código errado! Reenvie o código ou tente novamente com outro email')
+                return redirect(url_for('auth.checar_email'))
+
+
+
+
+
     # Pegando dados da rota de cadastro
     dados_usuarios = session.get('dados_usuario')
     # Carregando o formulário de código
@@ -154,7 +207,39 @@ def checar_email():
     return render_template('./email/cod_email.html', formulario=formulario)
         
 
+# Rota para confirmar senha - antes da atualização
+
+# Rota para confirmar novo email - depois de selecionar o novo email
+
+
+# Rota para atualizar dados de usuário 
+@auth_bp.route('/atualizar_email', methods=['GET', 'POST'])
+@login_required
+def atualizar_email():
+
+    formulario = EmailForm()
+
+    # Se o formulario for eviado 
+    if formulario.validate_on_submit():
+        email = formulario.email.data
+
+        # Colocando o novo email em session para enviar para a checagem
+        session['novo_email'] = email
+
+        # Redirecionando para a rota de checar email declarando a origem
+        origem = "atualizar_email"
+        return redirect(url_for('auth.checar_email', origem=origem))
+
     
+
+    return "email update"
+
+@auth_bp.route('/atualizar_senha')
+@login_required
+def atualizar_senha():
+
+    return "password update"
+            
 
 
 

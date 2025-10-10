@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="{{ url_for('atualizar_email') }}" method="post">
+        {{ formulario.hidden_tag() }}
+        {{ formulairo.email.label }}
+        {{ formulario.email(size=50) }}
+        <br>
+        {{ formulario.submit() }}
+        <br>
+        {% for erro in formulario.email.errors %}
+        <div class="mensagem_de_erro">
+            {{erro}}
+        </div>
+        {% endfor %}
+    </form>
+</body>
+</html>
