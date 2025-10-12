@@ -162,12 +162,16 @@ def iniciar_scheduler(app):
     # Agora vamos configurar para rodar todos os dias em um determinado horário específico 
     # Aqui eu escolhi rodar essa função todos os dias as 17h50
 
+    # Variáveis de hora e minuto
+    hora = 8
+    minutos = 0
+
     # Aqui chamei lambada primeiro para não acabar chamando a função no exato momento em que eu for apenas registrar a mesma 
-    schudeler.add_job(func=lambda: send_email(app), trigger='cron', hour=22, minute=48)
+    schudeler.add_job(func=lambda: send_email(app), trigger='cron', hour=hora, minute=minutos)
     # Inicializando
     schudeler.start()
 
-    print('Funcionando galeraaaaaa, ihuuuuuuu')
+    print(f'📧 VERIFICAÇÃO E ENVIO DE EMAILS REFERENTES A PRAZOS DE TAREFAS AUTOMATIZADO PARA:\n📅 Todos os dias às 🕒 {hora}:{minutos}0')
 
 
     

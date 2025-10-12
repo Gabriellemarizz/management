@@ -90,6 +90,8 @@ def cadastrar_usuario():
         # Criando código e colocando em uma session
         codigo = randint(100000,999999)
         session['codigo_verificador'] = codigo
+        # Declarando origem
+        session['origem'] = 'cadastrar_usuario'
 
         # Redirecionando dados para a rota de checar email
 
@@ -110,22 +112,53 @@ def checar_email():
     # 1º) É de cadastrar_usuario 
     # 2º) É de atualizar email
     # Um verificador de origem será enviado da rota atualizar_email, para que a rota apenas atualize e não cadastre um novo usuário
-
-    # Pegando dados da rota de cadastro
-    dados_usuarios = session.get('dados_usuario')
-    # Carregando o formulário de código
-    formulario = CodeForm()
     # Carregando código verificador 
     codigo_verificador = session.get('codigo_verificador')
     # Carregando origem
-    origem = request.args.get('origem')
+    origem = session.get('origem', None)
+    # Carregando dados do usuário 
+    dados_usuarios = session.get('dados_usuario', None)
+    # Carregando o formulário de código
+    formulario = CodeForm()
+
+    
+    # FUNÇÕES DE RECEBER DADOS DO FORMULÁRIO
+    if formulario.validate_on_submit():
+
+        # Carregando código do formulário
+        codigo_email = formulario.codigo.data
+
+        # ROTA DE ATUALIZAR EMAIL
+
+        if origem == 'atualizar_email' and current_user.is_authenticated:
+            # Pegando email novo no session
+            novo_email = session.get('novo_email')
+            
+            if codigo_email == codigo_verificador:
+                    # Buscando usuário atual
+                    novo_usuário = Usuario.query.filter_by(id=current_user.id).first()
+                    # Mudando o email
+                    novo_usuário.email = novo_email
+                    # Confirmando alteração no banco de dados
+                    db.session.commit()
+
+                    # Excluindo código verificador, novo email e origem
+                    session.pop('codigo_verificador')
+                    session.pop('novo_email')
+                    session.pop('origem')
+
+                    # Redirecionando ele para o controlador de usuários
+                    return redirect(url_for('user.index'))
+                
+            else:
+                    flash('Código errado! Reenvie o código ou tente novamente com outro email')
+                    return redirect(url_for('auth.checar_email'))
 
 
-    # ROTA DE ATUALIZAR EMAIL
-
-    if origem == 'atualizar_email':
+        # ROTA DE CADASTRAR USUÁRIO
+        
         # Recebendo dados de formulário
-        if formulario.validate_on_submit():
+        if origem == 'cadastrar_usuario':
             codigo_email = formulario.codigo.data
             if codigo_email == codigo_verificador:
                 # Cadastrando usuario
@@ -138,6 +171,11 @@ def checar_email():
                 db.session.add(novo_usuário)
                 # Finalizando a operação de inserção de novo usuário
                 db.session.commit()
+
+                # Excluindo sessions
+                session.pop('codigo_verificador')
+                session.pop('dados_usuario')
+                session.pop('origem')
                 
 
                 # Logando novo usuário no sistema
@@ -149,52 +187,28 @@ def checar_email():
             else:
                 flash('Código errado! Reenvie o código ou tente novamente com outro email')
                 return redirect(url_for('auth.checar_email'))
-
-
-
-
-
-    # Pegando dados da rota de cadastro
-    dados_usuarios = session.get('dados_usuario')
-    # Carregando o formulário de código
-    formulario = CodeForm()
-    # Carregando código verificador 
-    codigo_verificador = session.get('codigo_verificador')
     
-    # Recebendo dados de formulário
-    if formulario.validate_on_submit():
-        codigo_email = formulario.codigo.data
-        if codigo_email == codigo_verificador:
-            # Cadastrando usuario
-            # Como eu não construi a classe Usuario com self, eu tenho que passar manualmente quais
-            # Atributos eu quero inserir, não posso apenas jogar pela ordem.
-            novo_usuário = Usuario(nome_usuario=dados_usuarios[0], email=dados_usuarios[1])
-            # Usando set_password para gerar a senha em hash
-            novo_usuário.set_password(dados_usuarios[2])
-            # Adicionando usuario no banco
-            db.session.add(novo_usuário)
-            # Finalizando a operação de inserção de novo usuário
-            db.session.commit()
-            
+    # FUNÇÕES PARA PROCESSAR E ENVIAR EMAIL E FORMULÁRIO
 
-            # Logando novo usuário no sistema
-            login_user(novo_usuário)
+    # Processando para qual email enviar
 
-            # Redirecionando ele para o controlador de usuários
-            return redirect(url_for('user.index'))
-        
-        else:
-            flash('Código errado! Reenvie o código ou tente novamente com outro email')
-            return redirect(url_for('auth.checar_email'))
-    
+    if origem == 'atualizar_email':
+        email = session.get('novo_email')
+    else:
+        email = dados_usuarios[1]
 
-    # ENVIANDO EMAIL COM CÓDIGO
-    email = dados_usuarios[1]
 
+    # Processando mensagem
     mensagem = f'Código para confirmação: {codigo_verificador}'
 
+    
+    # Verificando se há internet para poder enviar
+
     if not verificar_conexao():
-        return "Não é possível realizar cadastramento por falta de conexão a internet"
+        if origem=='atualizar_email':
+            return "Não é possível realizar a atualização de email por falta de conexão a internet"
+        if origem=='cadastrar_usuario':
+            return "Não é possível realizar cadastramento por falta de conexão a internet"
 
     else:
         yag = yagmail.SMTP('l.kevenmedeiros.c@gmail.com', 'ozgj viwb whju dmot')
@@ -204,7 +218,9 @@ def checar_email():
             contents=mensagem
         )
 
-    return render_template('./email/cod_email.html', formulario=formulario)
+    # Depois de enviar o email, renderizando o template html para preencher o código verificador 
+
+    return render_template('./email/cod_email.html', formulario=formulario, origem=origem)
         
 
 # Rota para confirmar senha - antes da atualização
@@ -223,16 +239,23 @@ def atualizar_email():
     if formulario.validate_on_submit():
         email = formulario.email.data
 
+        
         # Colocando o novo email em session para enviar para a checagem
         session['novo_email'] = email
 
+        # Gerando um código verificador 
+        codigo = randint(100000,999999)
+        session['codigo_verificador'] = codigo
+
         # Redirecionando para a rota de checar email declarando a origem
-        origem = "atualizar_email"
-        return redirect(url_for('auth.checar_email', origem=origem))
+        session['origem'] = "atualizar_email"
+
+
+        return redirect(url_for('auth.checar_email'))
 
     
 
-    return "email update"
+    return render_template('./email/email_update.html', formulario=formulario)
 
 @auth_bp.route('/atualizar_senha')
 @login_required

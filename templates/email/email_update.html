@@ -6,10 +6,10 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="{{ url_for('auth.checar_email') }}" method="post">
+    <form action="{{ url_for('auth.atualizar_email') }}" method="post">
         {{ formulario.hidden_tag() }}
-        {{ formulario.codigo.label }}
-        {{ formulario.codigo(size=6) }}
+        {{ formulario.email.label }}
+        {{ formulario.email(size=32) }}
         <br>
         {{ formulario.submit() }}
         <br>
@@ -21,12 +21,6 @@
                 </ul>
             {% endif %}
         {% endwith %}
-        <a href="{{ url_for('auth.checar_email') }}">Reenviar código</a>
-        {% if origem %}
-        <p><a href="{{ url_for('auth.atualizar_email') }}">Usar outro email</a></p>
-        {% else %}
-        <p><a href="{{ url_for('auth.cadastrar_usuario') }}">Usar outro email</a></p>
-        {% endif %}
     </form>
 </body>
 </html>

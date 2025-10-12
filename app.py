@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, session
 from flask_login import LoginManager
 from models.models import db
 from models.models import Usuario
@@ -18,6 +18,33 @@ def create_app():
 
     # Inicializando 
     db.init_app(app)
+
+    # Limpando variavéis de autenticação de email armazenadas em session
+    # Porque? Alguém simplismente poderia acessar uma dessas rotas, e ao invés de completar a autenticação (o que acarretaria na 
+    # eliminação das variaveis), ela poderia simplismente mudar de rota e ir fazer outra coisa qualquer, e o session iria ficar salvo
+
+    # Minha solução foi: Se for para qualquer outra rota, apague
+    @app.before_request
+    def apagando_variaveis_de_email():
+        # Verificando a rota atual
+        rota_atual = request.endpoint
+
+        # Rotas permitidas
+        rotas_permitidas = [
+            'auth.atualizar_email',
+            'auth.checar_email',
+            'auth.cadastrar_usuario'
+        ]
+
+
+        if 'codigo_verificador' in session and rota_atual not in rotas_permitidas:
+                # Apagando variáveis
+                session.pop('codigo_verificador', None)
+                session.pop('origem', None)
+                session.pop('dados_usuario', None)
+                session.pop('novo_email')
+                print('🗑️ VARIÁVEIS DE AUTENTICAÇÃO DE EMAIL APAGADAS AO ACESSAR ROTAS DIVERGENTES')
+
     
     # Configurando Flask-Login
     login_manager = LoginManager()
