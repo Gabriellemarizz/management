@@ -12,6 +12,8 @@ from forms.eti_form import EtiquetaForm
 from sqlalchemy import func
 # Biblioteca que será utilizada no processo de medição de prazos
 from datetime import datetime, timezone, timedelta
+# Importando Usuario para verificação de ofensiva
+from models.models import Usuario
 
 user_bp = Blueprint(
     'user',
@@ -236,10 +238,22 @@ def criar_atividade():
         lista_id = formulario.lista_id.data
         etiquetas = formulario.etiquetas.data
 
-
+        # Verificando a ofensiva do usuário 
+        if status == 'concluida':
+            # Verificando a ofensiva do usuário
+            usuario = Usuario.query.filter_by(id=current_user.id).first()
+            if not usuario.ofensiva:
+                usuario.ofensiva = 1
+                usuario.data_ofensiva = datetime.now(brasil)
+            
+            if usuario.ofensiva and func.date(usuario.data_ofensiva) == func.date(datetime.today() - timedelta(days=1)):
+                usuario.ofensiva += 1
+                usuario.data_ofensiva = datetime.now(brasil)
+            
 
         # Registrando tarefa no banco de dados 
         nova_tarefa = Tarefa(titulo=titulo, descricao=descricao, data_limite=data_limite, prioridade=prioridade, status=status, concluida_em = datetime.now(brasil) if status == 'concluida' else None, lista_id=lista_id, usuario_id=current_user.id)
+
          # Dando um valor automático para o campo de ordem
         ultima_tarefa = Tarefa.query.filter_by(usuario_id = current_user.id).order_by(Tarefa.ordem.desc()).first()
         # Aqui ele procura a ultima tarefa cadastrada. Se houver, o indice dessa nova tarefa será o da antiga +1. Caso não haja, o indice será 0
