@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Confirme sua senha</h1>
+    <form action="{{ url_for('auth.confirmar_senha') }}" method="post">
+        {{ formulario.hidden_tag() }}
+        {{ formulario.senha.label }}
+        {{ formulario.senha(size=40) }}
+        <br>
+        {% for erro in formulario.senha.errors %}
+        <div class="mensagem_de_erro">
+            {{ erro }}
+        </div>
+        {% endfor %}
+        <br>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% set category, message = messages[-1] %}
+                    <li>{{ message }}</li>
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <br>
+        {{ formulario.submit() }}
+    </form>
+</body>
+</html>

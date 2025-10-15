@@ -142,11 +142,6 @@ def checar_email():
                     # Confirmando alteração no banco de dados
                     db.session.commit()
 
-                    # Excluindo código verificador, novo email e origem
-                    session.pop('codigo_verificador')
-                    session.pop('novo_email')
-                    session.pop('origem')
-
                     # Redirecionando ele para o controlador de usuários
                     return redirect(url_for('user.index'))
                 
@@ -171,11 +166,6 @@ def checar_email():
                 db.session.add(novo_usuário)
                 # Finalizando a operação de inserção de novo usuário
                 db.session.commit()
-
-                # Excluindo sessions
-                session.pop('codigo_verificador')
-                session.pop('dados_usuario')
-                session.pop('origem')
                 
 
                 # Logando novo usuário no sistema
@@ -223,10 +213,6 @@ def checar_email():
     return render_template('./email/cod_email.html', formulario=formulario, origem=origem)
         
 
-# Rota para confirmar senha - antes da atualização
-
-# Rota para confirmar novo email - depois de selecionar o novo email
-
 
 # Rota para atualizar dados de usuário 
 @auth_bp.route('/atualizar_email', methods=['GET', 'POST'])
@@ -257,11 +243,48 @@ def atualizar_email():
 
     return render_template('./email/email_update.html', formulario=formulario)
 
-@auth_bp.route('/atualizar_senha')
+
+# Rota confirmar senha
+@auth_bp.route('/confirmar_senha', methods=['POST', 'GET'])
+@login_required
+def confirmar_senha():
+    formulario = ConfirmSenhaForm()
+    # Verificando se a senha esta correta
+    if formulario.validate_on_submit():
+        session['token_password_update'] = True
+        return redirect(url_for('auth.atualizar_senha'))
+    
+    return render_template('./password/confirm.html', formulario=formulario)
+
+
+
+# Rota para atualizar senha
+@auth_bp.route('/atualizar_senha', methods=['POST', 'GET'])
 @login_required
 def atualizar_senha():
+    # Verificando permissão de acesso
+    permission = session.get('token_password_update', None)
 
-    return "password update"
+    # Validando entrada
+    if not permission:
+        flash('Para atualizar sua senha primeiro confirme com antecedência!')
+        return redirect(url_for('auth.confirmar_senha'))
+    
+    formulario = SenhaForm()
+    # Recebendo a nova senha
+    if formulario.validate_on_submit():
+        senha = formulario.senha.data
+        # Atualizando senha do usuário
+        usuario = Usuario.query.filter_by(id=current_user.id).first()
+        usuario.set_password(senha)
+        # Salvando alterações no banco de dados 
+        db.session.commit()
+        # Apagando o session de permissão para atualiza senha
+        session.pop('token_password_update', None)
+        # Redirecionando para a rota principal de usuário
+        return redirect(url_for('user.index'))
+
+    return render_template('./password/update.html', formulario=formulario)
             
 
 

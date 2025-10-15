@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Bem-vindo ao painel de Dashboard</h1>
+    <h5><a href="{{ url_for('user.index') }}">Home</a></h5>
+    <div style="width: 50%; margin: auto;" id="conclusao">
+        {{ grafico_conclusao_html|safe }}
+    </div>
+    <div style="width: 50%; margin: auto;" id="status">
+        {{ grafico_status_html|safe }}
+    </div>
+    <div style="width: 50%; margin: auto;" id="comparativas">
+        {{ grafico_comparativas_html|safe }}
+    </div>
+    <div id="streak">
+        
+    </div>
+
+    
+   
+
+</body>
+</html>

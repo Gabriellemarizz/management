@@ -1,6 +1,5 @@
-from models.models import db, Usuario
-from app import create_app
-import requests
+
+from datetime import datetime, timedelta
 
 
 # Inicializando a aplicação para poder realizar as operações de teste e criando a sua instância
@@ -18,7 +17,9 @@ with app.app_context():
     db.session.add(new_user)
     db.session.commit()
     print(f'User: {new_user.nome_usuario} inserido com sucesso!')
-"""
+
+
+
 # Função para testar conexão com internet
 def verificar_conexao():
     # Se a conexão der certo, retorna true
@@ -30,7 +31,7 @@ def verificar_conexao():
         return False
 
 # Testando aplicação para enviar email
-
+"""
 # Tudo dando certo: HEHEHEHEH
 mensagem = """
     
@@ -67,7 +68,7 @@ mensagem = """
 """
 
 
-
+"""
 
 import yagmail
 if not verificar_conexao():
@@ -83,3 +84,17 @@ else:
     )
 
     print('Verifique seu email BB')
+  """
+
+# TAREFA CONCLUIDAS VS CRIADAS
+hoje = datetime.today()
+
+# Dias da semana 
+semana = []
+
+# Preenchendo os dias da semana atual
+for i in range(7):
+    dia = hoje - timedelta(days=hoje.weekday()) + timedelta(days=i)
+    semana.append(dia.strftime("%A, %d/%m/%Y"))
+
+print(semana)

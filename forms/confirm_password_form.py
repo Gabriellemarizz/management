@@ -12,13 +12,12 @@ class ConfirmSenhaForm(FlaskForm):
 
     submit = SubmitField('Verificar')
 
-    def validar_senha(self, senha):
-        from models.models import Usuario
-        # Carregando usuário atual
-        usuario = Usuario.query.filter_by(id = current_user.id).first()
+    def validate_senha(self, senha):
+        from flask_login import current_user
         
         # O objetivo aqui é apenas verificar se a senha não bate com a do atual usuario logado
         # Esse template não é renderizado sem @login_required
-        if not usuario.check_password(senha):
+        # Aqui é mais seguro e nem precisa procurar o usuário no banco pelo ID já que está tudo salvo no current_user
+        if not current_user.check_password(senha.data):
             raise ValidationError(message='Senha inválida!')
 

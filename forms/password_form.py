@@ -6,7 +6,7 @@ class SenhaForm(FlaskForm):
 
     senha = PasswordField('senha', validators=[
         # Sem o DataRequired ele envia qualquer coisa e até mesmo campo nulo
-        DataRequired(message='email é obrigatório'),
+        DataRequired(message='Senha é obrigatório'),
         Regexp(
             regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$',
             # Fazendo o usuário obrigatóriamente cadastrar uma senha segura
@@ -19,6 +19,7 @@ class SenhaForm(FlaskForm):
     submit = SubmitField('Confirmar senha')
 
 
-    def confirmar_senha(self, senha, senha_confirm):
-        if senha != senha_confirm:
+    def validate_senha_confirm(self, senha_confirm):
+        # Verificando se as senhas batem antes de enviar
+        if senha_confirm.data != self.senha.data:
             raise ValidationError(message='As senhas tem que ser idênticas!')

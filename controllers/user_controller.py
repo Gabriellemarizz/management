@@ -11,7 +11,7 @@ from forms.eti_form import EtiquetaForm
 # Importando método func para usar o método de transformar todas as letras em minúsculo
 from sqlalchemy import func
 # Biblioteca que será utilizada no processo de medição de prazos
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 user_bp = Blueprint(
     'user',
@@ -19,6 +19,8 @@ user_bp = Blueprint(
     url_prefix="/user"
 )
 
+# Configurando horário de Brasilia
+brasil = timezone(timedelta(hours=-3))
 
 # Rota principal de usuário
 
@@ -235,8 +237,9 @@ def criar_atividade():
         etiquetas = formulario.etiquetas.data
 
 
+
         # Registrando tarefa no banco de dados 
-        nova_tarefa = Tarefa(titulo=titulo, descricao=descricao, data_limite=data_limite, prioridade=prioridade, status=status, lista_id=lista_id, usuario_id=current_user.id)
+        nova_tarefa = Tarefa(titulo=titulo, descricao=descricao, data_limite=data_limite, prioridade=prioridade, status=status, concluida_em = datetime.now(brasil) if status == 'concluida' else None, lista_id=lista_id, usuario_id=current_user.id)
          # Dando um valor automático para o campo de ordem
         ultima_tarefa = Tarefa.query.filter_by(usuario_id = current_user.id).order_by(Tarefa.ordem.desc()).first()
         # Aqui ele procura a ultima tarefa cadastrada. Se houver, o indice dessa nova tarefa será o da antiga +1. Caso não haja, o indice será 0
@@ -290,8 +293,18 @@ def editar_tarefa(id):
         tarefa.descricao = descricao
         tarefa.data_limite = data_limite
         tarefa.prioridade = prioridade
-        tarefa.status = status
         tarefa.lista_id = lista_id
+        if tarefa.status != 'conluida' and status == 'concluida':
+            # Atualizando data de conclusão
+            tarefa.concluida_em = datetime.now(brasil)
+            tarefa.status = status
+        elif tarefa.status == 'concluida' and status != 'concluida':
+            # Desmarcando status de conclusão
+            tarefa.concluida_em = None
+            tarefa.status = status
+        else:
+            tarefa.status = status
+        
 
         # Atualizando as etiquetas 
         # Aqui substituimos a lista antiga de etiquetas por uma nova lista
@@ -339,6 +352,8 @@ def concluir_tarefa(id):
     # Se estiver, ela volta a ser pendente
     if tarefa.status == 'concluida':
         tarefa.status = 'pendente'
+        # Retirando a data de conclusão
+        tarefa.concluida_em = None
         # Salvando alteração no banco 
         db.session.commit()
         # Rediracionando para rota principal de user
@@ -348,7 +363,8 @@ def concluir_tarefa(id):
 
         # Atualizando status 
         tarefa.status = 'concluida'
-
+        # Atualizando a data de conclusão
+        tarefa.concluida_em = datetime.now(brasil)
         # Salvando alterações no banco 
         db.session.commit()
 
@@ -364,6 +380,9 @@ def iniciar_tarefa(id):
     # Carregando tarefa 
     tarefa = Tarefa.query.get_or_404(id)
 
+    # Verificando se é concluida
+    if tarefa.status == 'concluida':
+        tarefa.criada_em = None
     # Atualizando status
     tarefa.status = "em andamento"
 

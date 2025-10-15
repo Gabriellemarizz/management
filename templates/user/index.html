@@ -6,7 +6,9 @@
     <title>Document</title>
 </head>
 <body>
+    <h1><a href="{{ url_for('teste.index') }}">Dashboard</a></h1>
     <h5><a href="{{ url_for('auth.atualizar_email') }}">Atualizar email</a></h5>
+    <h5><a href="{{ url_for('auth.confirmar_senha') }}">Atualizar senha</a></h5>
     <h1>Você está logado no sistema, seja bem vindo!</h1>
     <a href="{{ url_for('auth.deslogar_do_sistema') }}">Logout</a>
     <h3><a href="{{ url_for('user.criar_lista') }}">Criar lista</a></h3>

@@ -4,6 +4,11 @@ from sqlalchemy.orm import sessionmaker
 from flask_login import UserMixin
 # Biblioteca para salvar senha em hash
 from werkzeug.security import generate_password_hash, check_password_hash
+# Salvando atividades no horário de Brasilia
+from datetime import datetime, timezone, timedelta
+
+# Configurando horário de Brasilia 
+brasil = timezone(timedelta(hours=-3))
 
 db = SQLAlchemy()
 
@@ -65,8 +70,9 @@ class Tarefa(db.Model):
     status = db.Column(db.String(20), default='pendente') # Pendente, Em Andamento, Concluída
     prioridade = db.Column(db.String(20), default='normal') # Baixa, Normal, Alta, Urgente
     ordem = db.Column(db.Integer, default=0) # Aqui é um campo do banco para poder posicionar tarefas de maneira manual de acordo com esse ínice, que ficará variando
-    criada_em = db.Column(db.DateTime, default=datetime.utcnow)
-    atualizada_em = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    criada_em = db.Column(db.DateTime, default=lambda:datetime.now(brasil))
+    atualizada_em = db.Column(db.DateTime, default=lambda: datetime.now(brasil), onupdate=lambda: datetime.now(brasil))
+    concluida_em = db.Column(db.DateTime, nullable=True)
     lista_id = db.Column(db.Integer, db.ForeignKey('lista.id'), nullable=False)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     etiquetas = db.relationship('Etiqueta', secondary=tarefa_etiqueta, back_populates='tarefas')
