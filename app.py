@@ -6,7 +6,7 @@ from controllers.auth_controller import auth_bp
 from controllers.user_controller import user_bp
 from controllers.email_controller import email_bp, iniciar_scheduler
 # Importando controlador para testar novas funções
-from controllers.teste_controller import teste_bp
+from controllers.dashboard_controller import dashboard_bp
 
 def create_app():
 
@@ -86,7 +86,7 @@ def create_app():
     app.register_blueprint(user_bp)
     app.register_blueprint(email_bp)
     # Registrando blueprint de teste
-    app.register_blueprint(teste_bp)
+    app.register_blueprint(dashboard_bp)
 
     # Inicializado a biblioteca de trabalho automático para enviar meus emails automaticamente as 17h50
     iniciar_scheduler(app)

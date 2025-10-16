@@ -25,8 +25,6 @@ class Usuario(db.Model, UserMixin):
     nome_usuario = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     senha_hash = db.Column(db.String(128), nullable=True)
-    ofensiva = db.Column(db.Integer, nullable=True)
-    data_ofensiva = db.Column(db.DateTime, default = None)
     listas = db.relationship('Lista', backref='dono', lazy=True)
     tarefas = db.relationship('Tarefa', backref='usuario', lazy=True)
     comentarios = db.relationship('Comentario', backref='usuario', lazy=True)

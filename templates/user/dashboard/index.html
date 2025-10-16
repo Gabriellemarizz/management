@@ -9,6 +9,13 @@
 <body>
     <h1>Bem-vindo ao painel de Dashboard</h1>
     <h5><a href="{{ url_for('user.index') }}">Home</a></h5>
+    <h5>Menus</h5>
+    <ul>
+        <li><a href="{{ url_for('dashboard.analisar_por_tempo') }}">Análise temporal</a></li>
+        <li><a href=""></a></li>
+        <li><a href=""></a></li>
+        <li><a href=""></a></li>
+    </ul>
     <div style="width: 50%; margin: auto;" id="conclusao">
         {{ grafico_conclusao_html|safe }}
     </div>

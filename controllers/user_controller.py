@@ -14,6 +14,8 @@ from sqlalchemy import func
 from datetime import datetime, timezone, timedelta
 # Importando Usuario para verificação de ofensiva
 from models.models import Usuario
+# Instalando bibliotecas para gerar atividades aleatórias (titulos, descrições, etc)
+from faker import Faker
 
 user_bp = Blueprint(
     'user',
@@ -21,8 +23,12 @@ user_bp = Blueprint(
     url_prefix="/user"
 )
 
+
 # Configurando horário de Brasilia
 brasil = timezone(timedelta(hours=-3))
+
+# Configurando o faker
+fake = Faker('pt_BR')
 
 # Rota principal de usuário
 
@@ -237,18 +243,6 @@ def criar_atividade():
         status = formulario.status.data
         lista_id = formulario.lista_id.data
         etiquetas = formulario.etiquetas.data
-
-        # Verificando a ofensiva do usuário 
-        if status == 'concluida':
-            # Verificando a ofensiva do usuário
-            usuario = Usuario.query.filter_by(id=current_user.id).first()
-            if not usuario.ofensiva:
-                usuario.ofensiva = 1
-                usuario.data_ofensiva = datetime.now(brasil)
-            
-            if usuario.ofensiva and func.date(usuario.data_ofensiva) == func.date(datetime.today() - timedelta(days=1)):
-                usuario.ofensiva += 1
-                usuario.data_ofensiva = datetime.now(brasil)
             
 
         # Registrando tarefa no banco de dados 
@@ -299,7 +293,7 @@ def editar_tarefa(id):
         prioridade = formulario.prioridade.data
         status = formulario.status.data
         lista_id = formulario.lista_id.data
-
+                
         # Atualizando a tarefa
 
         # Adicionando novos valores 
@@ -586,6 +580,75 @@ def excluir_etiqueta(id):
     # Caso não tenha achado etiqueta, redireciona para a rota principal mesmo assim
     return redirect(url_for('user.index'))
 
+
+
+# ========================================================
+#                TESTES E EXPERIMENTOS
+# ========================================================
+
+@user_bp.route('/random_tasks')
+@login_required
+def random_tasks():
+    for i in range(50):
+        # Declarando valores 
+
+        # LISTAS
+        listas = Lista.query.filter_by(usuario_id = current_user.id).all()
+        listas_id = []
+        if listas:
+            listas_id = [li.id for li in listas]
+        else:
+            return "Crie primeiro uma lista válida antes de criar as atividades"
+        lista_id = fake.random_element(elements=listas_id)
+
+        titulo = fake.sentence(nb_words=3)
+        descricao = fake.paragraph(nb_sentences=2)
+        data_limite = fake.date_between(start_date='today', end_date=datetime.today() + timedelta(days=90))
+        data_criacao = fake.date_between(start_date=datetime.today() - timedelta(days=3), end_date='today')
+        status = fake.random_element(elements=('pendente', 'em andamento', 'concluida'))
+        concluida_em = None
+        if status == 'concluida':
+            concluida_em = fake.date_between(start_date=data_criacao, end_date='now')
+        prioridade = fake.random_element(elements=('baixa', 'normal', 'alta', 'urgente'))
+        # Dando um valor ao campo de ordem 
+        ultima_tarefa = Tarefa.query.filter_by(usuario_id = current_user.id).order_by(Tarefa.ordem.desc()).first()
+        if ultima_tarefa:
+            ordem = int(ultima_tarefa.ordem + 1) 
+        else:
+            ordem = 1
+        
+        # Registrando id do usuário
+        usuario_id = current_user.id 
+
+        # Criando a nova atividade
+        nova_tarefa = Tarefa(titulo=titulo, descricao=descricao, data_limite=data_limite, status=status, prioridade=prioridade, ordem=ordem, criada_em = data_criacao, lista_id=lista_id, usuario_id=usuario_id, concluida_em=concluida_em)
+        # Salvando no banco
+        db.session.add(nova_tarefa)
+        # Confirmando mudança
+        db.session.commit()
+
+    return redirect(url_for('user.index'))
+
+
+# Deletar todas as atividades 
+@user_bp.route('/delete_all_tasks')
+@login_required
+def delete_all_tasks():
+    tarefas = Tarefa.query.filter_by(usuario_id = current_user.id).all()
+
+    if tarefas:
+        # Deletando as tarefas
+        Tarefa.query.delete()
+        # Confirmando no banco de dados 
+        db.session.commit()
+        # Redirecionando para rota principal
+        return redirect(url_for('user.index'))
+    
+    else:
+        # Mostrando mensagem de erro
+        flash(message='Você não tem tarefas para deletar')
+        # Redirecionando para a rota principal
+        return redirect(url_for('user.index'))
 
 
 

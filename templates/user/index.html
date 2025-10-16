@@ -6,7 +6,17 @@
     <title>Document</title>
 </head>
 <body>
-    <h1><a href="{{ url_for('teste.index') }}">Dashboard</a></h1>
+    <h1><a href="{{ url_for('dashboard.index') }}">Dashboard</a></h1>
+    <h2><a href="{{ url_for('user.random_tasks') }}">Gerar atividade automaticamente</a></h2>
+    <h2><a href="{{ url_for('user.delete_all_tasks') }}">Apagar todas as tarefas</a></h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% set category, message = messages[-1] %}
+                    <li>{{ message }}</li>
+                </ul>
+            {% endif %}
+    {% endwith %}
     <h5><a href="{{ url_for('auth.atualizar_email') }}">Atualizar email</a></h5>
     <h5><a href="{{ url_for('auth.confirmar_senha') }}">Atualizar senha</a></h5>
     <h1>Você está logado no sistema, seja bem vindo!</h1>
@@ -121,7 +131,9 @@
                 <p>{{ tarefa.status }}</p>
                 <p>{{ tarefa.lista.nome }}</p>
                 <p>{{ tarefa.prioridade }}</p>
+                <h5>Data limite</h5>
                 <p>{{ tarefa.data_limite }}</p>
+                <h5>Data criação</h5>
                 <p>{{ tarefa.criada_em }}</p>
 
                 <a href="{{ url_for('user.editar_tarefa', id=tarefa.id) }}">Editar tarefa</a>
