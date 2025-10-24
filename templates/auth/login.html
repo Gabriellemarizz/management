@@ -3,36 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/login.css">
     <title>Document</title>
 </head>
 <body>
-    <form action="{{ url_for('auth.logar_no_sistema') }}", method="POST">
-        {{ formulario.hidden_tag() }}
-        {{ formulario.username.label }}
-        {{ formulario.username(size = 32) }}
-        {% for erro in formulario.username.errors %}
-        <div class="mensagem_de_erro">{{ erro }}</div>
-        {% endfor %}
-        <br><br>
-        {{ formulario.password.label}}
-        {{ formulario.password(size=32)}}
-        {% for erro in formulario.password.errors %}
-        <div class="mensagem_de_erro">{{ erro }}</div>
-        {% endfor %}
-        <br>
-        <br>
-        {{ formulario.submit() }}
-        <br>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul class="flashes">
-                    {% set category, message = messages[-1] %}
-                    <li>{{ message }}</li>
-                </ul>
-            {% endif %}
-        {% endwith %}
-    </form>
+    <div class="container">
+        <h1>Login</h1>
+        <form action="{{ url_for('auth.logar_no_sistema') }}", method="POST">
+            <div class="input">
+                {{ formulario.hidden_tag() }}
+                {{ formulario.username(size = 32, placeholder="username") }}
+                {% for erro in formulario.username.errors %}
+                <div class="mensagem_de_erro">{{ erro }}</div>
+                {% endfor %}
+                <br><br>
+                {{ formulario.password(size=32, placeholder="senha")}}
+                {% for erro in formulario.password.errors %}
+                <div class="mensagem_de_erro">{{ erro }}</div>
+                {% endfor %}
+                </div>
+                <br>
+                <br>
+                {{ formulario.submit() }}
+                <br>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <ul class="flashes">
+                            {% set category, message = messages[-1] %}
+                            <li>{{ message }}</li>
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+        </form>
 
-    <p>Ainda não é usuário? <a href="{{ url_for('auth.cadastrar_usuario') }}">Cadastre-se aqui</a></p>
+        <p>Ainda não é usuário? <a href="{{ url_for('auth.cadastrar_usuario') }}">Cadastre-se aqui</a></p>
+    </div>
+    
 </body>
 </html>
