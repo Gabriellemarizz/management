@@ -158,7 +158,7 @@ def index():
 
 
     
-    return render_template('./user/index.html', ordem=ordem, listas=listas, tarefas=tarefas, etiquetas=etiquetas)
+    return render_template('./user/dash.html', ordem=ordem, listas=listas, tarefas=tarefas, etiquetas=etiquetas)
 
 
 

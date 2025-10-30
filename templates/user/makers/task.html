@@ -1,71 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Criar Atividade</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <form action="{{ url_for('user.criar_atividade') }}" method="post">
-        {{ formulario.hidden_tag() }}
-        {{ formulario.titulo.label }}
-        {{ formulario.titulo(size=30) }}
-        {% for erro in formulario.titulo.errors %}
-        <div class="mensagem_de_erro">
-            {{ erro }}
+
+    <!-- HEADER -->
+    <header>
+        <h1><span>Gerenciando</span> Tarefas</h1>
+        <div class="header-buttons">
+            <a href="{{ url_for('user.index') }}" class="btn-header">Início</a>
+            <a href="{{ url_for('user.criar_lista') }}" class="btn-header">Criar Lista</a>
+            <a href="{{ url_for('user.criar_etiqueta') }}" class="btn-header">Criar Etiqueta</a>
+            <a href="{{ url_for('auth.deslogar_do_sistema') }}" class="btn-header logout">Sair</a>
         </div>
-        {% endfor %}
-        <br>
-        {{ formulario.descricao.label }}
-        {{ formulario.descricao(size=200) }}
-        {% for erro in formulario.descricao.errors %}
-        <div class="mensagem_de_erro">
-            {{ erro }}
+    </header>
+
+    <!-- CONTEÚDO -->
+    <main>
+        <div class="bloco">
+            <h2>Criar Nova Atividade</h2>
+
+            <form action="{{ url_for('user.criar_atividade') }}" method="post" class="formulario-atividade">
+                {{ formulario.hidden_tag() }}
+
+                <div class="form-group">
+                    <label>{{ formulario.titulo.label }}</label>
+                    {{ formulario.titulo(size=40, class="input-campo") }}
+                    {% for erro in formulario.titulo.errors %}
+                        <div class="mensagem_de_erro">{{ erro }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label>{{ formulario.descricao.label }}</label>
+                    {{ formulario.descricao(rows=4, cols=40, class="input-area") }}
+                    {% for erro in formulario.descricao.errors %}
+                        <div class="mensagem_de_erro">{{ erro }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-duplo">
+                    <div class="form-group">
+                        <label>{{ formulario.data_limite.label }}</label>
+                        {{ formulario.data_limite(class="input-campo") }}
+                        {% for erro in formulario.data_limite.errors %}
+                            <div class="mensagem_de_erro">{{ erro }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-group">
+                        <label>{{ formulario.prioridade.label }}</label>
+                        {{ formulario.prioridade(class="input-campo") }}
+                        {% for erro in formulario.prioridade.errors %}
+                            <div class="mensagem_de_erro">{{ erro }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-duplo">
+                    <div class="form-group">
+                        <label>{{ formulario.status.label }}</label>
+                        {{ formulario.status(class="input-campo") }}
+                        {% for erro in formulario.status.errors %}
+                            <div class="mensagem_de_erro">{{ erro }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-group">
+                        <label>{{ formulario.lista_id.label }}</label>
+                        {{ formulario.lista_id(class="input-campo") }}
+                        {% for erro in formulario.lista_id.errors %}
+                            <div class="mensagem_de_erro">{{ erro }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>{{ formulario.etiquetas.label }}</label>
+                    {{ formulario.etiquetas(class="input-campo") }}
+                    {% for erro in formulario.etiquetas.errors %}
+                        <div class="mensagem_de_erro">{{ erro }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-acoes">
+                    {{ formulario.submit(class="btn-header") }}
+                    <a href="{{ url_for('user.index') }}" class="btn-header btn-limpar">Cancelar</a>
+                </div>
+            </form>
         </div>
-        {% endfor %}
-        <br>
-        {{ formulario.data_limite.label }}
-        {{ formulario.data_limite }}
-        {% for erro in formulario.data_limite.errors %}
-        <div class="mensagem_de_erro">
-            {{ erro }}
-        </div>
-        {% endfor %}
-        <br>
-        {{ formulario.prioridade.label }}
-        {{ formulario.prioridade }}
-        {% for erro in formulario.prioridade.errors %}
-        <div class="mensagem_de_erro">
-            {{ erro }}
-        </div>
-        {% endfor %}
-        <br>
-        {{ formulario.status.label }}
-        {{ formulario.status }}
-        {% for erro in formulario.status.erros %}
-        <div class="mensagem_de_erro">
-            {{ erro }}
-        </div>
-        {% endfor %}
-        <br>
-        {{ formulario.lista_id.label }}
-        {{ formulario.lista_id }}
-        {% for erro in formulario.lista_id.errors %}
-        <div class="mensagem_de_erro">
-            {{ erro }}
-        </div>
-        {% endfor %}
-        <br>
-        {{ formulario.etiquetas.label }}
-        {{ formulario.etiquetas }}
-        {% for erro in formulario.etiquetas.erros %}
-        <div class="mensagem_de_erro">
-            {{ erro }}
-        </div>
-        {% endfor %}
-        <br>
-        {{ formulario.submit() }}
-    </form>
-    
+    </main>
+
 </body>
 </html>
