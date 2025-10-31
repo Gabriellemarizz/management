@@ -1,38 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/estilo.css">
-    <title>Document</title>
+    <title>Cadastro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro.css') }}">
 </head>
 <body>
-    <form action="{{ url_for('auth.cadastrar_usuario') }}" method="post">
-        {{ formulario_cad.hidden_tag() }}
-        {{ formulario_cad.nome.label }}
-        {{ formulario_cad.nome(size=32) }}
-        {% for erro in formulario_cad.nome.errors %}
-        <div class="mensagem_de_erro">
-            {{erro}} 
-        </div>
-        {% endfor %}
-        <br><br>
-        {{ formulario_cad.email.label }}
-        {{ formulario_cad.email(size=32) }}
-        {% for erro in formulario_cad.email.errors %}
-        <div class="mensagem_de_erro">{{erro}}</div>
-        {% endfor %}
-    
-        <br><br>
-        {{ formulario_cad.senha.label }}
-        {{ formulario_cad.senha(size=32) }}
-        {% for erro in formulario_cad.senha.errors %}
-        <div class="mensagem_de_erro">
-            {{erro}}
-        </div>
-        {% endfor %}
-        <br>
-        {{ formulario_cad.submit() }}
-    </form>
+    <div class="form-container">
+        <h1>Cadastro</h1>
+
+        <form action="{{ url_for('auth.cadastrar_usuario') }}" method="post">
+            {{ formulario_cad.hidden_tag() }}
+
+            <!-- Linha 1: Nome e E-mail -->
+            <div class="form-row">
+                <div class="input-group">
+                    {{ formulario_cad.nome.label }}
+                    {{ formulario_cad.nome(size=32, placeholder="Nome completo") }}
+                    {% for erro in formulario_cad.nome.errors %}
+                        <div class="mensagem_de_erro">{{ erro }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="input-group">
+                    {{ formulario_cad.email.label }}
+                    {{ formulario_cad.email(size=32, placeholder="e-mail") }}
+                    {% for erro in formulario_cad.email.errors %}
+                        <div class="mensagem_de_erro">{{ erro }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Linha 2: Senha -->
+            <div class="form-row">
+                <div class="input-group" style="width: 100%;">
+                    {{ formulario_cad.senha.label }}
+                    {{ formulario_cad.senha(size=32, placeholder="senha") }}
+                    {% for erro in formulario_cad.senha.errors %}
+                        <div class="mensagem_de_erro">{{ erro }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Botão -->
+            <div class="form-button">
+                {{ formulario_cad.submit(class="btn-salvar") }}
+            </div>
+        </form>
+    </div>
 </body>
 </html>

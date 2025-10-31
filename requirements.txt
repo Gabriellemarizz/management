@@ -1,24 +1,11 @@
-APScheduler==3.11.0
 blinker==1.9.0
-cachetools==6.2.0
-certifi==2025.10.5
-charset-normalizer==3.4.3
 click==8.3.0
 colorama==0.4.6
-cssselect==1.3.0
-cssutils==2.11.1
-dnspython==2.8.0
-email-validator==2.3.0
 Flask==3.1.2
-Flask-Login==0.6.3
-Flask-SQLAlchemy==3.1.1
-Flask-WTF==1.2.2
-greenlet==3.2.4
-idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.6
-lxml==6.0.2
 MarkupSafe==3.0.3
+<<<<<<< HEAD
 more-itertools==10.8.0
 narwhals==2.8.0
 packaging==25.0
@@ -30,6 +17,6 @@ typing_extensions==4.15.0
 tzdata==2025.2
 tzlocal==5.3.1
 urllib3==2.5.0
+=======
+>>>>>>> 2b55ab113c3b10095a04057dc6f5b42f2debeb3b
 Werkzeug==3.1.3
-WTForms==3.2.1
-yagmail==0.15.293

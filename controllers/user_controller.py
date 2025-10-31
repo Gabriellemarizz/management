@@ -11,7 +11,7 @@ from forms.eti_form import EtiquetaForm
 # Importando método func para usar o método de transformar todas as letras em minúsculo
 from sqlalchemy import func
 # Biblioteca que será utilizada no processo de medição de prazos
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, date
 # Importando Usuario para verificação de ofensiva
 from models.models import Usuario
 # Instalando bibliotecas para gerar atividades aleatórias (titulos, descrições, etc)
@@ -43,6 +43,11 @@ def index():
     etiquetas = Etiqueta.query.all()
     # Variável para medição de tempo
     hoje = datetime.today()
+
+    # Contador para tarefas atrasadas 
+    total_atrasadas = Tarefa.query.filter(Tarefa.data_limite < date.today(), Tarefa.usuario_id == current_user.id).all()
+    if total_atrasadas:
+        total_atrasadas = int(len(total_atrasadas)) 
 
 
 
@@ -132,8 +137,11 @@ def index():
             if filtro_lista:
                 tarefas = [t for t in tarefas if t.lista_id == int(filtro_lista)]
 
-            if filtro_status:
+            if filtro_status and filtro_status != 'atrasadas':
                 tarefas = [t for t in tarefas if t.status == filtro_status]
+            
+            if filtro_status == 'atrasadas':
+                tarefas = [t for t in tarefas if t.data_limite.date() < date.today()]
 
             if filtro_etiquetas:
                 filtro_etiquetas_ids = [int(e) for e in filtro_etiquetas]
@@ -168,7 +176,7 @@ def index():
 
 
     
-    return render_template('./user/index.html', ordem=ordem, listas=listas, tarefas=tarefas, etiquetas=etiquetas)
+    return render_template('./user/dash.html', ordem=ordem, listas=listas, tarefas=tarefas, etiquetas=etiquetas, total_atrasadas=total_atrasadas)
 
 
 
@@ -522,15 +530,22 @@ def criar_etiqueta():
     if formulario.validate_on_submit():
         nome = formulario.nome.data
 
-        # Criando nova etiqueta 
-        nova_etiqueta = Etiqueta(nome=nome, usuario_id=current_user.id)
-        # Adicionando no banco 
-        db.session.add(nova_etiqueta)
-        # Salvando no banco 
-        db.session.commit()
+        # Verificando se o usuario já tem uma etiqueta com esse nome 
+        if nome:
+            etiqueta = Etiqueta.query.filter(Etiqueta.nome == nome, Etiqueta.usuario_id == current_user.id).first()
+            if etiqueta:
+                flash(message='Já existe uma etiqueta com esse nome!')
+                return redirect(url_for('user.criar_etiqueta'))
+            else: 
+                # Criando nova etiqueta 
+                nova_etiqueta = Etiqueta(nome=nome, usuario_id=current_user.id)
+                # Adicionando no banco 
+                db.session.add(nova_etiqueta)
+                # Salvando no banco 
+                db.session.commit()
 
-        # Redirecionando para a rota principal de usuário
-        return redirect(url_for('user.index'))
+                # Redirecionando para a rota principal de usuário
+                return redirect(url_for('user.index'))
     
     return render_template('./user/makers/etiqueta.html', formulario=formulario)
 
@@ -539,6 +554,7 @@ def criar_etiqueta():
 @user_bp.route('/atualizar_etiqueta/<int:id>', methods=['POST', 'GET'])
 @login_required
 def atualizar_etiqueta(id):
+    
     # Procurando etiqueta a ser atualizada
     etiqueta = Etiqueta.query.get_or_404(id)
     # Carregando formulário já preenchido com os dados atuais 

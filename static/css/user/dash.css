@@ -1,0 +1,314 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+:root {
+  --rosa: #ffb6db;
+  --verde: #47a56d;
+  --amarelo: #ffe87c;
+  --roxo: #2e004f;
+  --azul: #b5d9ff;
+  --fundo: #fff9dc;
+  --cinza: #f3f3f3;
+  --texto: #222;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  transition: all 0.25s ease-in-out;
+}
+
+body {
+  background-color: var(--fundo);
+  color: var(--texto);
+  line-height: 1.5;
+}
+
+/* ---------- HEADER ---------- */
+header {
+  background-color: var(--verde);
+  color: #fff;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 5px solid var(--roxo);
+  flex-wrap: wrap;
+}
+
+header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+header h1 span {
+  background-color: var(--amarelo);
+  color: #000;
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.header-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn-header {
+  background-color: #fff;
+  color: var(--roxo);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: 2px solid var(--roxo);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-header:hover {
+  background-color: var(--amarelo);
+  color: var(--roxo);
+}
+
+.logout {
+  background-color: var(--amarelo);
+  color: #000;
+}
+
+.logout:hover {
+  background-color: var(--roxo);
+  color: #fff;
+}
+
+/* ---------- SEÇÕES ---------- */
+main {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.bloco {
+  background-color: #fff;
+  border: 2px solid var(--roxo);
+  border-radius: 10px;
+  padding: 25px 30px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.bloco h2 {
+  background-color: var(--amarelo);
+  padding: 6px 14px;
+  display: inline-block;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #000;
+}
+
+/* ---------- LISTAS E ETIQUETAS ---------- */
+ul {
+  list-style: none;
+}
+
+ul li {
+  background-color: var(--rosa);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.acoes a {
+  text-decoration: none;
+  color: #fff;
+  background-color: var(--roxo);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  margin-left: 6px;
+}
+
+.acoes a:hover {
+  background-color: var(--verde);
+}
+
+/* ---------- FILTROS ---------- */
+.filtros {
+  background-color: var(--cinza);
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.filtros form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+select, input[type="text"] {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+  background: #fff;
+  font-size: 0.9rem;
+}
+
+button, .btn-filtrar, .btn-limpar {
+  background-color: var(--amarelo);
+  border: 1px solid var(--roxo);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #000;
+  text-decoration: none;
+}
+
+.btn-filtrar:hover {
+  background-color: var(--verde);
+  color: #fff;
+}
+
+.btn-limpar {
+  background-color: var(--rosa);
+}
+
+.btn-limpar:hover {
+  background-color: var(--roxo);
+  color: #fff;
+}
+
+/* ---------- TAREFAS ---------- */
+.lista-tarefas {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.tarefa-item {
+  background-color: var(--azul);
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid var(--roxo);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  box-shadow: 0 3px 7px rgba(0,0,0,0.08);
+}
+
+/* STATUS DE TAREFAS */
+.tarefa-item[data-status="pendente"] {
+  background-color: #ffe5e5;
+  border-left: 6px solid crimson;
+}
+
+.tarefa-item[data-status="em_andamento"] {
+  background-color: #fff5d1;
+  border-left: 6px solid #ffb300;
+}
+
+.tarefa-item[data-status="concluida"] {
+  background-color: #d9ffe0;
+  border-left: 6px solid #32a852;
+}
+
+.tarefa-info {
+  flex: 1;
+  min-width: 250px;
+}
+
+.tarefa-info h3 {
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  color: var(--roxo);
+}
+
+.tarefa-info p {
+  margin-bottom: 4px;
+  font-size: 0.95rem;
+}
+
+.tarefa-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.tarefa-acoes a {
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #fff;
+  background-color: var(--roxo);
+}
+
+.tarefa-acoes a.excluir {
+  background-color: crimson;
+}
+
+.tarefa-acoes a:hover {
+  background-color: var(--verde);
+}
+
+.tarefa-etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tarefa-etiquetas .tag {
+  background-color: var(--amarelo);
+  color: #000;
+  border-radius: 5px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ---------- ESTADOS ---------- */
+.vazio {
+  color: #666;
+  font-style: italic;
+  padding: 8px;
+  text-align: left;
+}
+
+/* ---------- RESPONSIVO ---------- */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  main {
+    padding: 20px;
+  }
+
+  .tarefa-item {
+    flex-direction: column;
+  }
+
+  .filtros form {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

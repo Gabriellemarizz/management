@@ -56,7 +56,7 @@ class Lista(db.Model):
 class Etiqueta(db.Model):
     __tablename__ = 'etiqueta'
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(64), unique=True, nullable=False)
+    nome = db.Column(db.String(64), nullable=False)
     tarefas = db.relationship('Tarefa', secondary=tarefa_etiqueta, back_populates='etiquetas')
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
 

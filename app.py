@@ -1,4 +1,4 @@
-from flask import Flask, request, session, redirect, url_for
+from flask import Flask, request, session, redirect, url_for, render_template
 from flask_login import LoginManager
 from models.models import db
 from models.models import Usuario
@@ -70,10 +70,10 @@ def create_app():
     login_manager.login_view = 'auth.logar_no_sistema'  
     login_manager.login_message = 'Por favor, faça login para acessar esta página.'
 
-    # Aqui adicionamos uma função index de redirecionamento de usuário para a página de login
+    # Aqui é carregado a página de boas vindas e apresentação das funcionalidades do sistema
     @app.route('/')
     def index():
-         return redirect(url_for('auth.logar_no_sistema'))
+         return render_template('index.html')
     
     # Função para carregar usuário 
     @login_manager.user_loader

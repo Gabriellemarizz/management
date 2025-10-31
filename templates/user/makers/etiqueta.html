@@ -17,6 +17,15 @@
         </div>
         {% endfor %}
         <br>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% set category, message = messages[-1] %}
+                    <li>{{ message }}</li>
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <br>
         {{ formulario.submit() }}
     </form>
 </body>

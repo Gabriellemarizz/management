@@ -1,0 +1,53 @@
+/* ---------- FORMULÁRIOS ---------- */
+.formulario-atividade {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.input-campo, select, textarea {
+  padding: 10px 12px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #fff;
+}
+
+.input-area {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.mensagem_de_erro {
+  color: crimson;
+  font-size: 0.9rem;
+  margin-top: 3px;
+}
+
+.form-duplo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.form-duplo .form-group {
+  flex: 1;
+  min-width: 220px;
+}
+
+.form-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}

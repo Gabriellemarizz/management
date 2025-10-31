@@ -10,8 +10,12 @@
 <body>
     <header>
         <div class="top-bar">
-            <button class="btn entrar">ENTRAR</button>
-            <button class="btn cadastro">CADASTRO</button>
+            <form action="{{ url_for('auth.logar_no_sistema') }}">
+            <button type="submit" class="btn entrar">ENTRAR</button>
+            </form>
+            <form action="{{ url_for('auth.cadastrar_usuario') }}">
+            <button type="submit" class="btn cadastro">CADASTRO</button>
+            </form>
         </div>
     </header>
     

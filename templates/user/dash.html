@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Tarefas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/dash.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>GERENCIADOR <span>TAREFAS</span></h1>
+    <div class="header-buttons">
+        <a href="{{ url_for('user.criar_lista') }}" class="btn-header">Criar Lista</a>
+        <a href="{{ url_for('user.criar_atividade') }}" class="btn-header">Criar Atividade</a>
+        <a href="{{ url_for('user.criar_etiqueta') }}" class="btn-header">Criar Etiqueta</a>
+        <a href="{{ url_for('auth.deslogar_do_sistema') }}" class="btn-header logout">Sair</a>
+    </div>
+</header>
+
+<main>
+
+    <!-- LISTAS -->
+    <section class="bloco">
+        <h2>Minhas Listas</h2>
+        <ul>
+            {% for list in listas %}
+            <li>
+                <span>{{ list.nome }}</span>
+                <div class="acoes">
+                    <a href="{{ url_for('user.editar_lista', id=list.id) }}">Editar</a>
+                    <a href="{{ url_for('user.excluir_lista', id=list.id) }}">Excluir</a>
+                </div>
+            </li>
+            {% else %}
+            <li class="vazio">Nenhuma lista foi criada ainda</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <!-- ETIQUETAS -->
+    <section class="bloco">
+        <h2>Minhas Etiquetas</h2>
+        <ul>
+            {% for etiqueta in etiquetas %}
+            <li>
+                <span>{{ etiqueta.nome }}</span>
+                <div class="acoes">
+                    <a href="{{ url_for('user.atualizar_etiqueta', id=etiqueta.id) }}">Editar</a>
+                    <a href="{{ url_for('user.excluir_etiqueta', id=etiqueta.id) }}">Excluir</a>
+                </div>
+            </li>
+            {% else %}
+            <li class="vazio">Nenhuma etiqueta foi criada ainda</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <!-- TAREFAS -->
+    <section class="bloco">
+        <h2>Minhas Tarefas</h2>
+
+        {% if total_atrasadas %}<h4>Total de atividades atrasadas: {{ total_atrasadas }}</h4>{% endif %}
+
+        <div class="filtros">
+            <form action="{{ url_for('user.ordenar_tarefa') }}" method="post">
+                <label>Ordenar por:</label>
+                <select name="ordem" id="ordem_select" onchange="this.form.submit()">
+                    <option {% if ordem =='prazo_curto' %}selected{% endif %} value="prazo_curto">Prazo curto</option>
+                    <option {% if ordem=='prazo_longo' %}selected{% endif %} value="prazo_longo">Prazo longo</option>
+                    <option {% if ordem=='recentes' %}selected{% endif %} value="recentes">Recentes</option>
+                    <option {% if ordem=='antigas' %} selected{% endif %} value="antigas">Antigas</option>
+                    <option {% if ordem=='prioridade' %} selected{% endif %} value="prioridade">Prioridade</option>
+                    <option {% if ordem=='manual' %} selected{% endif %} value="manual">Manual</option>
+                </select>
+            </form>
+
+            <form action="{{ url_for('user.filtrar_tarefas') }}" method="post">
+                <label>Status:</label>
+                <select name="status" id="status">
+                    <option value="">Selecione</option>
+                    <option {% if session.get('filtros', [{}])[0].get('status') == 'concluida' %}selected{% endif %} value="concluida">Concluída</option>
+                    <option {% if session.get('filtros', [{}])[0].get('status') == 'em andamento' %}selected{% endif %} value="em andamento">Em andamento</option>
+                    <option {% if session.get('filtros', [{}])[0].get('status') == 'pendente' %}selected{% endif %} value="pendente">Pendente</option>
+                    <option {% if session.get('filtros', [{}])[0].get('status') == 'atrasadas' %}selected{% endif %} value="atrasadas">Atrasadas</option>
+                </select>
+
+                <label>Lista:</label>
+                <select name="lista" id="lista">
+                    <option value="">Selecione</option>
+                    {% for lista in listas %}
+                        <option {% if lista.id == (session.get('filtros', [{}])[0].get('lista') | int) %}selected{% endif %} value="{{ lista.id }}">{{ lista.nome }}</option>
+                    {% endfor %}
+                </select>
+
+                {% set filtros_etiquetas = session.get('filtros', [{}])[0].get('etiquetas', []) | map('int') | list %}
+                <div class="etiquetas-filtro">
+                    {% for etiqueta in etiquetas %}
+                    <label>
+                        <input {% if etiqueta.id in filtros_etiquetas %}checked{% endif %} type="checkbox" name="etiqueta_filtro" value="{{ etiqueta.id }}">
+                        {{ etiqueta.nome }}
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <button class="btn-filtrar" type="submit">Filtrar</button>
+                <a href="{{ url_for('user.limpar_filtro') }}" class="btn-limpar">Limpar</a>
+            </form>
+
+            <form action="{{ url_for('user.filtrar_tarefas_by_palavras_chave') }}" method="post" class="busca">
+                <input
+                    type="text"
+                    name="barra_pesquisa"
+                    placeholder="O que você procura?"
+                    {% if session.get('filtro_palavra_chave_modo')==True %}
+                        value="{{ session.get('filtro_palavra_chave') }}"
+                    {% endif %}>
+                <button type="submit">Pesquisar</button>
+                <a href="{{ url_for('user.apagar_filtro_de_palavras_chave') }}" class="btn-limpar">Limpar</a>
+            </form>
+        </div>
+
+        <ul class="lista-tarefas" {% if ordem=='manual' %}id="lista_de_tarefas"{% endif %}>
+            {% for tarefa in tarefas %}
+            <li class="tarefa-item" data-id="{{ tarefa.id }}">
+                <div class="tarefa-info">
+                    <h3>{{ tarefa.titulo }}</h3>
+                    <p>{{ tarefa.descricao }}</p>
+                    <p><strong>Status:</strong> {{ tarefa.status }}</p>
+                    <p><strong>Lista:</strong> {{ tarefa.lista.nome }}</p>
+                    <p><strong>Prioridade:</strong> {{ tarefa.prioridade }}</p>
+                    <p><strong>Prazo:</strong> {{ tarefa.data_limite }}</p>
+                    <p><strong>Criada em:</strong> {{ tarefa.criada_em }}</p>
+
+                    <div class="tarefa-acoes">
+                        <a href="{{ url_for('user.editar_tarefa', id=tarefa.id) }}">Editar</a>
+                        <a href="{{ url_for('user.excluir_tarefa', id=tarefa.id) }}" class="excluir">Excluir</a>
+                        <a href="{{ url_for('user.concluir_tarefa', id=tarefa.id) }}">Concluir</a>
+                        {% if tarefa.status != 'concluida' %}
+                        <a href="{{ url_for('user.iniciar_tarefa', id=tarefa.id) }}">Iniciar</a>
+                        {% endif %}
+                    </div>
+
+                    {% if ordem == 'prazo_curto' or ordem == 'prazo_longo' %}
+                    <p class="prazo">
+                        {% if tarefa.tempo_restante == 0 %}
+                        Hoje
+                        {% elif tarefa.tempo_restante < 0 %}
+                        Atraso: {{ tarefa.tempo_restante * -1 }} dia(s)
+                        {% else %}
+                        Restam {{ tarefa.tempo_restante }} dia(s)
+                        {% endif %}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div class="tarefa-etiquetas">
+                    {% for etiqueta in tarefa.etiquetas %}
+                    <span class="tag">{{ etiqueta.nome }}</span>
+                    {% endfor %}
+                </div>
+            </li>
+            {% else %}
+            <p class="vazio">Nenhuma tarefa cadastrada ainda.</p>
+            {% endfor %}
+        </ul>
+    </section>
+</main>
+
+<script>
+    const lista = document.getElementById('lista_de_tarefas');
+    if (lista) {
+        new Sortable(lista, {
+            animation: 150,
+            onEnd: function(evt) {
+                let ordem = [];
+                document.querySelectorAll('#lista_de_tarefas li').forEach((li, index) => {
+                    ordem.push({ id: li.dataset.id, ordem: index });
+                });
+
+                fetch("{{ url_for('user.ordenar_manualmente') }}", {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ ordem: ordem })
+                });
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background-color: #fff9dc; /* amarelo claro */
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-container {
+  background-color: #ffb6db; /* rosa */
+  border: 2px solid #2e004f; /* roxo escuro */
+  border-radius: 8px;
+  padding: 40px 50px;
+  width: 520px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+  text-align: left;
+  font-size: 2.2em;
+  margin-bottom: 25px;
+  color: #000;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  width: 48%;
+}
+
+label {
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: #000;
+}
+
+input {
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+input::placeholder {
+  color: #999;
+}
+
+.btn-salvar {
+  display: block;
+  background-color: #47a56d; /* verde */
+  color: #000;
+  font-weight: 600;
+  border: 1px solid #000;
+  border-radius: 4px;
+  padding: 10px 40px;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin: 20px auto 0;
+}
+
+.btn-salvar:hover {
+  background-color: #3b8a5a;
+}
+
+.mensagem_de_erro {
+  color: red;
+  font-size: 13px;
+  margin-top: 3px;
+}
